@@ -1,7 +1,12 @@
+using Microsoft.EntityFrameworkCore;
 using ProjectManager.Api.Conventions;
 using ProjectManager.Api.Middlewares;
+using ProjectManager.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ProjectManagerDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddControllers(options =>
 {
