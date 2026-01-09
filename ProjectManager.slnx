@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="ProjectManager.Api/ProjectManager.Api.csproj" Id="5169d47b-37a3-4586-a18d-f1220a21c5f9" />
+  <Project Path="ProjectManager.Application/ProjectManager.Application.csproj" Id="4ffb0467-8432-4c35-adc3-717dee07a61b" />
+  <Project Path="ProjectManager.Contracts/ProjectManager.Contracts.csproj" Id="2f8b2b15-24e2-4613-b301-c9a2c1466bac" />
+  <Project Path="ProjectManager.Domain/ProjectManager.Domain.csproj" Id="fb0ec412-296a-4d6f-a7b8-a1492ee727d8" />
+  <Project Path="ProjectManager.Infrastructure/ProjectManager.Infrastructure.csproj" Id="a5607160-4a52-492f-a8f3-3815dd54f952" />
+</Solution>
