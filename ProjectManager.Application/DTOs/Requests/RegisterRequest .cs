@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Application.DTOs
+﻿namespace ProjectManager.Application.DTOs.Requests
 {
     public sealed class RegisterRequest
     {

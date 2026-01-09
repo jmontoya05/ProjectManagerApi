@@ -1,4 +1,4 @@
-﻿using ProjectManager.Application.DTOs;
+﻿using ProjectManager.Application.DTOs.Requests;
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 

@@ -20,12 +20,9 @@ namespace ProjectManager.Api.Middlewares
             }
             catch (Exception ex)
             {
-                var correlationId =
-                    context.Items.TryGetValue(CorrelationIdMiddleware.ItemKey, out var value) &&
-                    value is string s &&
-                    !string.IsNullOrEmpty(s)
-                        ? s
-                        : Guid.NewGuid().ToString();
+                var correlationId = GetCorrelationId(context);
+
+
 
                 using (_logger.BeginScope(new Dictionary<string, object> { ["correlationId"] = correlationId }))
                 {
@@ -48,6 +45,15 @@ namespace ProjectManager.Api.Middlewares
                     await context.Response.WriteAsync(json);
                 }
             }
+        }
+
+        public static string GetCorrelationId(HttpContext context)
+        {
+            return context.Items.TryGetValue(CorrelationIdMiddleware.ItemKey, out var value) &&
+                    value is string s &&
+                    !string.IsNullOrEmpty(s)
+                        ? s
+                        : Guid.NewGuid().ToString();
         }
     }
 }

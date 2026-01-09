@@ -15,7 +15,25 @@ namespace ProjectManager.Infrastructure.Repositories
         public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default) =>
             await _context.Users.AnyAsync(u => u.Email == email, ct);
 
+        public async Task<User?> GetByEmailAsync(string email, CancellationToken ct = default) =>
+            await _context.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
+
         public Task<int> SaveChangesAsync(CancellationToken ct = default) =>
             _context.SaveChangesAsync(ct);
+
+        public async Task SaveRefreshTokenAsync(Guid userId, string token, DateTime expiresAt, CancellationToken ct = default)
+        {
+            var rt = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Token = token,
+                ExpiresAt = expiresAt,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _context.RefreshTokens.AddAsync(rt, ct);
+            await _context.SaveChangesAsync(ct);
+        }
     }
 }

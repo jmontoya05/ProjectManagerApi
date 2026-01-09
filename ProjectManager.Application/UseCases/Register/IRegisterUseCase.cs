@@ -1,4 +1,4 @@
-﻿using ProjectManager.Application.DTOs;
+﻿using ProjectManager.Application.DTOs.Requests;
 
 namespace ProjectManager.Application.UseCases.Register
 {
