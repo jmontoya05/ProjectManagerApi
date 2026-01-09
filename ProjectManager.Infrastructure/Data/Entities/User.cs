@@ -6,7 +6,7 @@
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
-        public string Displayn { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
         public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public Guid? CreatedBy { get; set; }
@@ -15,6 +15,6 @@
 
         //Navigation Properties
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
-        public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
+        //public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
     }
 }

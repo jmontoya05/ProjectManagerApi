@@ -9,8 +9,8 @@
         public DateTime CreatedAt { get; set; }
 
         //Navigation properties
-        public virtual Organization Organization { get; set; } = null!;
-        public virtual User User { get; set; } = null!;
-        public virtual Role Role { get; set; } = null!;
+        //public virtual Organization Organization { get; set; } = null!;
+        //public virtual User User { get; set; } = null!;
+        //public virtual Role Role { get; set; } = null!;
     }
 }
