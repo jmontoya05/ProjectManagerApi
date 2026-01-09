@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProjectManager.Infrastructure.Data.Entities;
+using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Infrastructure.Data
 {

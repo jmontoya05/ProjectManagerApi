@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Infrastructure.Data.Entities
+﻿namespace ProjectManager.Domain.Entities
 {
     public class OrganizationMembership
     {

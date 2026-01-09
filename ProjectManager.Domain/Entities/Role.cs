@@ -1,6 +1,6 @@
-﻿namespace ProjectManager.Infrastructure.Data.Entities
+﻿namespace ProjectManager.Domain.Entities
 {
-    public class Permission
+    public class Role
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
@@ -9,5 +9,8 @@
         public Guid? CreatedBy { get; set; }
         public DateTime UpdatedAt { get; set; }
         public Guid? UpdatedBy { get; set; }
+
+        //Navigation properties
+        //public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
     }
 }
