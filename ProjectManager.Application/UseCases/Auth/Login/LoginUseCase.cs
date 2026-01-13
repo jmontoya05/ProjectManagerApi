@@ -4,7 +4,7 @@ using ProjectManager.Application.DTOs.Responses;
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 
-namespace ProjectManager.Application.UseCases.Login
+namespace ProjectManager.Application.UseCases.Auth.Login
 {
     public class LoginUseCase(IUserRepository userRepository, ITokenService tokenService) : ILoginUseCase
     {
@@ -37,6 +37,7 @@ namespace ProjectManager.Application.UseCases.Login
                     Id = user.Id,
                     Email = user.Email,
                     DisplayName = user.DisplayName,
+                    Status = user.Status
                 }
             };
         }

@@ -2,7 +2,7 @@
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 
-namespace ProjectManager.Application.UseCases.Register
+namespace ProjectManager.Application.UseCases.Auth.Register
 {
     public sealed class RegisterUseCase(IUserRepository userRepository) : IRegisterUseCase
     {
@@ -27,7 +27,6 @@ namespace ProjectManager.Application.UseCases.Register
             };
 
             await _userRepository.AddAsync(user, ct);
-            await _userRepository.SaveChangesAsync(ct);
 
             return user.Id;
         }

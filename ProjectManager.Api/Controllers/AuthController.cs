@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.Requests;
-using ProjectManager.Application.UseCases.Login;
-using ProjectManager.Application.UseCases.Logout;
-using ProjectManager.Application.UseCases.Refresh;
-using ProjectManager.Application.UseCases.Register;
+using ProjectManager.Application.UseCases.Auth.Login;
+using ProjectManager.Application.UseCases.Auth.Logout;
+using ProjectManager.Application.UseCases.Auth.Refresh;
+using ProjectManager.Application.UseCases.Auth.Register;
 
 namespace ProjectManager.Api.Controllers
 {
@@ -110,7 +110,7 @@ namespace ProjectManager.Api.Controllers
                         message = ex.Message
                     });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(
                     500,
@@ -161,7 +161,7 @@ namespace ProjectManager.Api.Controllers
         private string GetCorrelationId() =>
             ExceptionHandlingMiddleware.GetCorrelationId(HttpContext);
 
-        private IActionResult GetInvalidModelResponse()
+        private BadRequestObjectResult GetInvalidModelResponse()
         {
             return BadRequest(
                 new

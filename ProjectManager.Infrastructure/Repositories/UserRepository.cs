@@ -9,25 +9,20 @@ namespace ProjectManager.Infrastructure.Repositories
     {
         private readonly ProjectManagerDbContext _context = context;
 
-        public async Task AddAsync(User user, CancellationToken ct = default) =>
+        public async Task AddAsync(User user, CancellationToken ct = default)
+        {
             await _context.Users.AddAsync(user, ct);
+            await SaveChangesAsync(ct);
+        }
 
-        public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default) =>
-            await _context.Users.AnyAsync(u => u.Email == email, ct);
+        public Task<User?> GetByIdAsync(Guid userId, CancellationToken ct = default) =>
+            _context.Users.FirstOrDefaultAsync(u => u.Id == userId, ct);
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken ct = default) =>
             await _context.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
 
-        public async Task<RefreshToken?> GetValidRefreshTokenAsync(string token, CancellationToken ct = default) =>
-            await _context.RefreshTokens
-                .Include(rt => rt.User)
-                .FirstOrDefaultAsync(rt => rt.Token == token && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow, ct);
-
-        public async Task RevokeRefreshTokenAsync(RefreshToken token, CancellationToken ct = default)
-        {
-            token.RevokedAt = DateTime.UtcNow;
-            await SaveChangesAsync(ct);
-        }
+        public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default) =>
+            await _context.Users.AnyAsync(u => u.Email == email, ct);
 
         public async Task SaveRefreshTokenAsync(Guid userId, string token, DateTime expiresAt, CancellationToken ct = default)
         {
@@ -44,7 +39,20 @@ namespace ProjectManager.Infrastructure.Repositories
             await SaveChangesAsync(ct);
         }
 
-        public Task<int> SaveChangesAsync(CancellationToken ct = default) =>
+        public async Task<RefreshToken?> GetValidRefreshTokenAsync(string token, CancellationToken ct = default) =>
+            await _context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == token && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow, ct);
+
+        public async Task RevokeRefreshTokenAsync(RefreshToken token, CancellationToken ct = default)
+        {
+            token.RevokedAt = DateTime.UtcNow;
+            await SaveChangesAsync(ct);
+        }
+
+        private Task<int> SaveChangesAsync(CancellationToken ct = default) =>
             _context.SaveChangesAsync(ct);
+
+
     }
 }

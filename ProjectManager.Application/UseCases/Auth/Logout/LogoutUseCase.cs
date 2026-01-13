@@ -1,7 +1,7 @@
 ﻿using ProjectManager.Application.DTOs.Requests;
 using ProjectManager.Application.Ports;
 
-namespace ProjectManager.Application.UseCases.Logout
+namespace ProjectManager.Application.UseCases.Auth.Logout
 {
     public sealed class LogoutUseCase(IUserRepository userRepository) : ILogoutUseCase
     {

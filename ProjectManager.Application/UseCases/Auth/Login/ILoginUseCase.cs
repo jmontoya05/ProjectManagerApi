@@ -1,7 +1,7 @@
 ﻿using ProjectManager.Application.DTOs.Requests;
 using ProjectManager.Application.DTOs.Responses;
 
-namespace ProjectManager.Application.UseCases.Login
+namespace ProjectManager.Application.UseCases.Auth.Login
 {
     public interface ILoginUseCase
     {

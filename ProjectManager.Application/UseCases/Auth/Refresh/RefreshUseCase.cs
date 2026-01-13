@@ -3,7 +3,7 @@ using ProjectManager.Application.DTOs.Responses;
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 
-namespace ProjectManager.Application.UseCases.Refresh
+namespace ProjectManager.Application.UseCases.Auth.Refresh
 {
     public sealed class RefreshUseCase(IUserRepository userRepository, ITokenService tokenService) : IRefreshUseCase
     {

@@ -21,6 +21,8 @@ namespace ProjectManager.Infrastructure.Services
                 new Claim(JwtRegisteredClaimNames.Email, email.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            Console.WriteLine(claims[0]);
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
