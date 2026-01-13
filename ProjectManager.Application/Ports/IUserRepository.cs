@@ -9,5 +9,7 @@ namespace ProjectManager.Application.Ports
         Task AddAsync(User user, CancellationToken ct = default);
         Task SaveRefreshTokenAsync(Guid userId, string token, DateTime expiresAt, CancellationToken ct = default);
         Task<int> SaveChangesAsync(CancellationToken ct = default);
+        Task<RefreshToken?> GetValidRefreshTokenAsync(string token, CancellationToken ct = default);
+        Task RevokeRefreshTokenAsync(RefreshToken token, CancellationToken ct = default);
     }
 }

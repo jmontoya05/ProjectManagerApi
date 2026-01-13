@@ -18,8 +18,16 @@ namespace ProjectManager.Infrastructure.Repositories
         public async Task<User?> GetByEmailAsync(string email, CancellationToken ct = default) =>
             await _context.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
 
-        public Task<int> SaveChangesAsync(CancellationToken ct = default) =>
-            _context.SaveChangesAsync(ct);
+        public async Task<RefreshToken?> GetValidRefreshTokenAsync(string token, CancellationToken ct = default) =>
+            await _context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == token && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow, ct);
+
+        public async Task RevokeRefreshTokenAsync(RefreshToken token, CancellationToken ct = default)
+        {
+            token.RevokedAt = DateTime.UtcNow;
+            await SaveChangesAsync(ct);
+        }
 
         public async Task SaveRefreshTokenAsync(Guid userId, string token, DateTime expiresAt, CancellationToken ct = default)
         {
@@ -33,7 +41,10 @@ namespace ProjectManager.Infrastructure.Repositories
             };
 
             await _context.RefreshTokens.AddAsync(rt, ct);
-            await _context.SaveChangesAsync(ct);
+            await SaveChangesAsync(ct);
         }
+
+        public Task<int> SaveChangesAsync(CancellationToken ct = default) =>
+            _context.SaveChangesAsync(ct);
     }
 }

@@ -2,16 +2,20 @@
 using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.Requests;
 using ProjectManager.Application.UseCases.Login;
+using ProjectManager.Application.UseCases.Logout;
+using ProjectManager.Application.UseCases.Refresh;
 using ProjectManager.Application.UseCases.Register;
 
 namespace ProjectManager.Api.Controllers
 {
     [Controller]
     [Route("auth")]
-    public class AuthController(IRegisterUseCase registerUseCase, ILoginUseCase loginUseCase) : ControllerBase
+    public class AuthController(IRegisterUseCase registerUseCase, ILoginUseCase loginUseCase, IRefreshUseCase refreshUseCase, ILogoutUseCase logoutUseCase) : ControllerBase
     {
         private readonly IRegisterUseCase _registerUseCase = registerUseCase;
         private readonly ILoginUseCase _loginUseCase = loginUseCase;
+        private readonly IRefreshUseCase _refreshUseCase = refreshUseCase;
+        private readonly ILogoutUseCase _logoutUseCase = logoutUseCase;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -69,6 +73,75 @@ namespace ProjectManager.Api.Controllers
                     {
                         correlationId = GetCorrelationId(),
                         errorCode = "UNAUTHORIZED",
+                        message = ex.Message
+                    });
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INTERNAL_ERROR",
+                        message = "An unexpected error occurred"
+                    });
+            }
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+        {
+            if (!ModelState.IsValid)
+                return GetInvalidModelResponse();
+
+            try
+            {
+                var response = await _refreshUseCase.Execute(request);
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid or expired refresh token"))
+            {
+                return Unauthorized(
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INVALID_REFRESH",
+                        message = ex.Message
+                    });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INTERNAL_ERROR",
+                        message = "An unexpected error occurred"
+                    });
+            }
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        {
+            if (!ModelState.IsValid)
+                return GetInvalidModelResponse();
+
+            try
+            {
+                await _logoutUseCase.Execute(request);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid refresh token"))
+            {
+
+                return BadRequest(
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INVALID_TOKEN",
                         message = ex.Message
                     });
             }

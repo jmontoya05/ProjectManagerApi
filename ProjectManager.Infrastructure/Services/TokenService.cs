@@ -11,7 +11,7 @@ namespace ProjectManager.Infrastructure.Services
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public string GenerateAccesToken(Guid userId, string email)
+        public string GenerateAccessToken(Guid userId, string email)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

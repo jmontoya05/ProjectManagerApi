@@ -6,6 +6,8 @@ using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 using ProjectManager.Application.UseCases.Login;
+using ProjectManager.Application.UseCases.Logout;
+using ProjectManager.Application.UseCases.Refresh;
 using ProjectManager.Application.UseCases.Register;
 using ProjectManager.Infrastructure.Data;
 using ProjectManager.Infrastructure.Repositories;
@@ -51,6 +53,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRegisterUseCase, RegisterUseCase>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
+builder.Services.AddScoped<IRefreshUseCase, RefreshUseCase>();
+builder.Services.AddScoped<ILogoutUseCase, LogoutUseCase>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
@@ -75,4 +79,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
