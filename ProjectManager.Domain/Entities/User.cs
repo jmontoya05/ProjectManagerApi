@@ -15,6 +15,6 @@
 
         //Navigation Properties
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
-        //public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
+        public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
     }
 }

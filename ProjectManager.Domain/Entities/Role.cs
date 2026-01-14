@@ -11,6 +11,6 @@
         public Guid? UpdatedBy { get; set; }
 
         //Navigation properties
-        //public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
+        public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
     }
 }

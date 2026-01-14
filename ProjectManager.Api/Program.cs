@@ -48,7 +48,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("OrganizationMember", policy =>
+        policy.RequireClaim("org"))
+    .AddPolicy("OrganizationAdmin", policy =>
+        policy.RequireClaim("org")
+            .RequireClaim("role", "Admin", "owner"))
+    .AddPolicy("AnyAdmin", policy =>
+        policy.RequireClaim("role", "Admin", "Owner"));
 
 //Dependency injection
 builder.Services.AddScoped<ITokenService, TokenService>();

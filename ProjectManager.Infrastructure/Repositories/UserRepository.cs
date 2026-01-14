@@ -53,6 +53,22 @@ namespace ProjectManager.Infrastructure.Repositories
         private Task<int> SaveChangesAsync(CancellationToken ct = default) =>
             _context.SaveChangesAsync(ct);
 
+        public async Task<IEnumerable<string>> GetUserRolesAsync(Guid userId, Guid? organizationId, CancellationToken ct = default)
+        {
+            var query = _context.OrganizationMemberships
+                .Where(om => om.UserId == userId);
 
+            if (organizationId.HasValue)
+            {
+                query = query
+                    .Where(om => om.OrganizationId == organizationId);
+            }
+
+            var roles = await query
+                .Select(om => om.Role.Name)
+                .ToListAsync(ct);
+
+            return roles.Distinct();
+        }
     }
 }

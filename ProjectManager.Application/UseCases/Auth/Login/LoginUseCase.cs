@@ -22,7 +22,8 @@ namespace ProjectManager.Application.UseCases.Auth.Login
             if (user.Status != "Active")
                 throw new InvalidOperationException("User is blocked");
 
-            var accesToken = _tokenService.GenerateAccessToken(user.Id, user.Email);
+            var roles = await _userRepository.GetUserRolesAsync(user.Id, organizationId: null, ct);
+            var accesToken = _tokenService.GenerateAccessToken(user.Id, user.Email, organizationId: null, roles);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
             await _userRepository.SaveRefreshTokenAsync(user.Id, refreshToken, DateTime.UtcNow.AddDays(7), ct);

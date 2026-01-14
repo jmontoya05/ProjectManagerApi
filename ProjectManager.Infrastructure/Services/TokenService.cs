@@ -11,18 +11,30 @@ namespace ProjectManager.Infrastructure.Services
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public string GenerateAccessToken(Guid userId, string email)
+        public string GenerateAccessToken(Guid userId, string email, Guid? organizationId = null, IEnumerable<string>? roles = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, email.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new(JwtRegisteredClaimNames.Sub, userId.ToString()),
+                new(JwtRegisteredClaimNames.Email, email.ToString()),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            Console.WriteLine(claims[0]);
+            if (organizationId.HasValue)
+            {
+                claims.Add(new("org", organizationId.Value.ToString()));
+            }
+
+            if (roles is not null)
+            {
+                foreach (var role in roles)
+                {
+                    claims.Add(new("role", role));
+                }
+            }
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
