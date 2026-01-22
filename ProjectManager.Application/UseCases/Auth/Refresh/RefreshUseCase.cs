@@ -10,20 +10,21 @@ namespace ProjectManager.Application.UseCases.Auth.Refresh
         private readonly IUserRepository _userRepository = userRepository;
         private readonly ITokenService _tokenService = tokenService;
 
-        public async Task<RefreshResponse> Execute(RefreshRequest request, CancellationToken ct = default)
+        public async Task<RefreshResponse> Execute(RefreshRequest request, Guid organizationId, CancellationToken ct = default)
         {
             var stored = await _userRepository.GetValidRefreshTokenAsync(request.RefreshToken, ct)
                 ?? throw new InvalidOperationException("Invalid or expired refresh token");
 
-            var newAccessToken = _tokenService.GenerateAccessToken(stored.UserId, stored.User.Email);
+            var roles = await _userRepository.GetUserRolesByOrganizationAsync(stored.UserId, organizationId, ct);
+            var newAccessToken = _tokenService.GenerateAccessToken(stored.UserId, stored.User.Email, organizationId, roles);
             var newRefreshToken = _tokenService.GenerateRefreshToken();
             await _userRepository.RevokeRefreshTokenAsync(stored, ct);
             await _userRepository.SaveRefreshTokenAsync(stored.UserId, newRefreshToken, DateTime.UtcNow.AddDays(7), ct);
 
             return new RefreshResponse
             {
-                AccesToken = newAccessToken,
-                ExpiresInSeconds = 15 * 60,
+                Token = newAccessToken,
+                ExpiresInMinutes = 60,
                 RefreshToken = newRefreshToken
             };
         }

@@ -50,19 +50,10 @@ namespace ProjectManager.Infrastructure.Repositories
             await SaveChangesAsync(ct);
         }
 
-        private Task<int> SaveChangesAsync(CancellationToken ct = default) =>
-            _context.SaveChangesAsync(ct);
-
-        public async Task<IEnumerable<string>> GetUserRolesAsync(Guid userId, Guid? organizationId, CancellationToken ct = default)
+        public async Task<IEnumerable<string>> GetUserRolesByOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default)
         {
             var query = _context.OrganizationMemberships
-                .Where(om => om.UserId == userId);
-
-            if (organizationId.HasValue)
-            {
-                query = query
-                    .Where(om => om.OrganizationId == organizationId);
-            }
+                .Where(om => om.UserId == userId && om.OrganizationId == organizationId);
 
             var roles = await query
                 .Select(om => om.Role.Name)
@@ -70,5 +61,26 @@ namespace ProjectManager.Infrastructure.Repositories
 
             return roles.Distinct();
         }
+
+        public async Task<IEnumerable<Organization>> GetUserOrganizationsAsync(Guid userId, CancellationToken ct = default)
+        {
+            var query = _context.OrganizationMemberships
+                .Where(om => om.UserId == userId);
+
+            var organizations = await query
+                .Select(om => om.Organization)
+                .ToListAsync(ct);
+
+            return organizations.Distinct();
+        }
+
+        public async Task<bool> UserBelongsToOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default)
+        {
+            return await _context.OrganizationMemberships
+                .AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
+        }
+
+        private Task<int> SaveChangesAsync(CancellationToken ct = default) =>
+            _context.SaveChangesAsync(ct);
     }
 }

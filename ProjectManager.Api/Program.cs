@@ -9,10 +9,15 @@ using ProjectManager.Application.UseCases.Auth.Login;
 using ProjectManager.Application.UseCases.Auth.Logout;
 using ProjectManager.Application.UseCases.Auth.Refresh;
 using ProjectManager.Application.UseCases.Auth.Register;
+using ProjectManager.Application.UseCases.Auth.SelectOrganization;
+using ProjectManager.Application.UseCases.Teams.Create;
+using ProjectManager.Application.UseCases.Teams.Get;
+using ProjectManager.Application.UseCases.Teams.List;
 using ProjectManager.Application.UseCases.Users.GetProfile;
 using ProjectManager.Infrastructure.Data;
 using ProjectManager.Infrastructure.Repositories;
 using ProjectManager.Infrastructure.Services;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,27 +49,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("OrganizationMember", policy =>
-        policy.RequireClaim("org"))
-    .AddPolicy("OrganizationAdmin", policy =>
-        policy.RequireClaim("org")
-            .RequireClaim("role", "Admin", "owner"))
-    .AddPolicy("AnyAdmin", policy =>
-        policy.RequireClaim("role", "Admin", "Owner"));
+    .AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin", "Owner"));
+
 
 //Dependency injection
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRegisterUseCase, RegisterUseCase>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
+builder.Services.AddScoped<ISelectOrganizationUseCase, SelectOrganizationUseCase>();
 builder.Services.AddScoped<IRefreshUseCase, RefreshUseCase>();
 builder.Services.AddScoped<ILogoutUseCase, LogoutUseCase>();
 builder.Services.AddScoped<IGetProfileUseCase, GetProfileUseCase>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<ICreateTeamUseCase, CreateTeamUseCase>();
+builder.Services.AddScoped<IListTeamsUseCase, ListTeamsUseCase>();
+builder.Services.AddScoped<IGetTeamByIdUseCase, GetTeamByIdUseCase>();
 
 var app = builder.Build();
 
@@ -83,6 +90,8 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthentication();
+
+app.UseMiddleware<OrganizationMiddleware>();
 
 app.UseAuthorization();
 

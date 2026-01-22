@@ -5,24 +5,23 @@ using ProjectManager.Application.UseCases.Auth.Login;
 using ProjectManager.Application.UseCases.Auth.Logout;
 using ProjectManager.Application.UseCases.Auth.Refresh;
 using ProjectManager.Application.UseCases.Auth.Register;
+using ProjectManager.Application.UseCases.Auth.SelectOrganization;
 
 namespace ProjectManager.Api.Controllers
 {
-    [Controller]
+    [ApiController]
     [Route("auth")]
-    public class AuthController(IRegisterUseCase registerUseCase, ILoginUseCase loginUseCase, IRefreshUseCase refreshUseCase, ILogoutUseCase logoutUseCase) : ControllerBase
+    public class AuthController(IRegisterUseCase registerUseCase, ILoginUseCase loginUseCase, ISelectOrganizationUseCase selectOrganizationUseCase, IRefreshUseCase refreshUseCase, ILogoutUseCase logoutUseCase) : ControllerBase
     {
         private readonly IRegisterUseCase _registerUseCase = registerUseCase;
         private readonly ILoginUseCase _loginUseCase = loginUseCase;
+        private readonly ISelectOrganizationUseCase _selectOrganizationUse = selectOrganizationUseCase;
         private readonly IRefreshUseCase _refreshUseCase = refreshUseCase;
         private readonly ILogoutUseCase _logoutUseCase = logoutUseCase;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            if (!ModelState.IsValid)
-                return GetInvalidModelResponse();
-
             try
             {
                 var userId = await _registerUseCase.Execute(request);
@@ -56,9 +55,6 @@ namespace ProjectManager.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (!ModelState.IsValid)
-                return GetInvalidModelResponse();
-
             try
             {
                 var response = await _loginUseCase.Execute(request);
@@ -89,15 +85,51 @@ namespace ProjectManager.Api.Controllers
             }
         }
 
+        [HttpPost("organization")]
+        public async Task<IActionResult> SelectOrganization([FromBody] SelectOrganizationRequest request)
+        {
+            try
+            {
+                var response = await _selectOrganizationUse.Execute(request);
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid or expired refresh token") ||
+                                                        ex.Message.Contains("User not in organization"))
+            {
+                return Unauthorized(
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "UNAUTHORIZED",
+                        message = ex.Message
+                    });
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INTERNAL_ERROR",
+                        message = "An unexpected error occurred"
+                    });
+            }
+        }
+
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
         {
-            if (!ModelState.IsValid)
-                return GetInvalidModelResponse();
-
             try
             {
-                var response = await _refreshUseCase.Execute(request);
+                var orgClaim = User.FindFirst("OrganizationId")?.Value;
+
+                if (Guid.TryParse(orgClaim, out var organizationId))
+                {
+                    return BadRequest();
+                }
+
+                var response = await _refreshUseCase.Execute(request, organizationId);
                 return Ok(response);
             }
             catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid or expired refresh token"))
@@ -126,9 +158,6 @@ namespace ProjectManager.Api.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
-            if (!ModelState.IsValid)
-                return GetInvalidModelResponse();
-
             try
             {
                 await _logoutUseCase.Execute(request);
@@ -160,22 +189,5 @@ namespace ProjectManager.Api.Controllers
 
         private string GetCorrelationId() =>
             ExceptionHandlingMiddleware.GetCorrelationId(HttpContext);
-
-        private BadRequestObjectResult GetInvalidModelResponse()
-        {
-            return BadRequest(
-                new
-                {
-                    correlationId = GetCorrelationId(),
-                    errorCode = "INVALID_MODEL",
-                    message = "Invalid registration data",
-                    deatils = ModelState
-                                .Where(kvp => kvp.Value?.Errors?.Count > 0)
-                                .ToDictionary(
-                                    kvp => kvp.Key,
-                                    kvp => kvp.Value?.Errors?.Select(e => e.ErrorMessage).ToArray() ?? []
-                                )
-                });
-        }
     }
 }

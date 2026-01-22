@@ -22,24 +22,25 @@ namespace ProjectManager.Application.UseCases.Auth.Login
             if (user.Status != "Active")
                 throw new InvalidOperationException("User is blocked");
 
-            var roles = await _userRepository.GetUserRolesAsync(user.Id, organizationId: null, ct);
-            var accesToken = _tokenService.GenerateAccessToken(user.Id, user.Email, organizationId: null, roles);
-            var refreshToken = _tokenService.GenerateRefreshToken();
+            var organizations = await _userRepository.GetUserOrganizationsAsync(user.Id, ct);
+            var organizationsDto = organizations
+                .Select(o => new OrganizationDto { Id = o.Id, Name = o.Name })
+                .ToList();
 
+            var refreshToken = _tokenService.GenerateRefreshToken();
             await _userRepository.SaveRefreshTokenAsync(user.Id, refreshToken, DateTime.UtcNow.AddDays(7), ct);
 
             return new LoginResponse
             {
-                AccessToken = accesToken,
-                ExpiresInSeconds = 15 * 60,
-                RefreshToken = refreshToken,
                 User = new UserDto
                 {
                     Id = user.Id,
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     Status = user.Status
-                }
+                },
+                Organizations = organizationsDto,
+                RefreshToken = refreshToken
             };
         }
     }

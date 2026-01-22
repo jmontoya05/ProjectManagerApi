@@ -11,6 +11,8 @@ namespace ProjectManager.Application.Ports
         Task SaveRefreshTokenAsync(Guid userId, string token, DateTime expiresAt, CancellationToken ct = default);
         Task<RefreshToken?> GetValidRefreshTokenAsync(string token, CancellationToken ct = default);
         Task RevokeRefreshTokenAsync(RefreshToken token, CancellationToken ct = default);
-        Task<IEnumerable<string>> GetUserRolesAsync(Guid userId, Guid? organizationId, CancellationToken ct = default);
+        Task<IEnumerable<string>> GetUserRolesByOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
+        Task<IEnumerable<Organization>> GetUserOrganizationsAsync(Guid userId, CancellationToken ct = default);
+        Task<bool> UserBelongsToOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
     }
 }

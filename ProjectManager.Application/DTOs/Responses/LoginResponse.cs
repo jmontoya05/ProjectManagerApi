@@ -2,9 +2,8 @@
 {
     public sealed class LoginResponse
     {
-        public string AccessToken { get; set; } = null!;
-        public int ExpiresInSeconds { get; set; }
-        public string RefreshToken { get; set; } = null!;
         public UserDto User { get; set; } = null!;
+        public IEnumerable<OrganizationDto> Organizations { get; set; } = [];
+        public string RefreshToken { get; set; } = null!;
     }
 }

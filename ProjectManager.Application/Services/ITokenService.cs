@@ -2,7 +2,7 @@
 {
     public interface ITokenService
     {
-        string GenerateAccessToken(Guid userId, string email, Guid? organizationId = null, IEnumerable<string>? roles = null);
+        string GenerateAccessToken(Guid userId, string email, Guid organizationId, IEnumerable<string> roles);
         string GenerateRefreshToken();
     }
 }

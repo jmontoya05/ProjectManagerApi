@@ -6,8 +6,9 @@ using System.Security.Claims;
 
 namespace ProjectManager.Api.Controllers
 {
-    [Controller]
+    [ApiController]
     [Route("users")]
+    [Authorize]
     public class UserController(IGetProfileUseCase getProfileUseCase) : ControllerBase
     {
         private readonly IGetProfileUseCase _getProfileUseCase = getProfileUseCase;

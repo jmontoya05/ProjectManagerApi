@@ -11,7 +11,7 @@ namespace ProjectManager.Infrastructure.Services
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public string GenerateAccessToken(Guid userId, string email, Guid? organizationId = null, IEnumerable<string>? roles = null)
+        public string GenerateAccessToken(Guid userId, string email, Guid organizationId, IEnumerable<string> roles)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -19,27 +19,20 @@ namespace ProjectManager.Infrastructure.Services
             {
                 new(JwtRegisteredClaimNames.Sub, userId.ToString()),
                 new(JwtRegisteredClaimNames.Email, email.ToString()),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new("OrganizationId", organizationId.ToString())
             };
 
-            if (organizationId.HasValue)
+            foreach (var role in roles)
             {
-                claims.Add(new("org", organizationId.Value.ToString()));
-            }
-
-            if (roles is not null)
-            {
-                foreach (var role in roles)
-                {
-                    claims.Add(new("role", role));
-                }
+                claims.Add(new(ClaimTypes.Role, role));
             }
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(60),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -3,22 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ProjectManager.Api.Controllers
 {
-    [Controller]
+    [ApiController]
     [Route("organizations")]
+    [Authorize]
     public class OrganizationController : ControllerBase
     {
         //Methot to test organization endpoint
-        [HttpGet("{id}")]
-        [Authorize(Policy = "OrganizationMember")]
-        public async Task<IActionResult> GetOrganization(Guid id)
+        [HttpGet("{orgId}")]
+        public async Task<IActionResult> GetOrganization(Guid orgId)
         {
-            var userOrgClaim = User.FindFirst("org")?.Value;
+            var orgClaim = User.FindFirst("OrganizationId")?.Value;
 
-            if (Guid.TryParse(userOrgClaim, out var userOrgId) && userOrgId != id)
+            if (Guid.TryParse(orgClaim, out var organizationId) && organizationId != orgId)
             {
                 return BadRequest();
             }
-            return Ok(userOrgClaim);
+            return Ok(organizationId);
         }
     }
 }
