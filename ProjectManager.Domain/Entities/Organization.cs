@@ -13,7 +13,7 @@
 
         //Navigation properties
         public virtual User Owner { get; set; } = null!;
-        //public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
-
+        public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
+        public virtual ICollection<Team> Teams { get; set; } = [];
     }
 }

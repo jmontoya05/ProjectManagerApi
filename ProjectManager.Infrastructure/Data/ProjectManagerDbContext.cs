@@ -5,35 +5,61 @@ namespace ProjectManager.Infrastructure.Data
 {
     public class ProjectManagerDbContext(DbContextOptions<ProjectManagerDbContext> options) : DbContext(options)
     {
-        private static readonly DateTime SeedDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly DateTime SeedDate = new(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         public DbSet<User> Users => Set<User>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<Permission> Permissions => Set<Permission>();
         public DbSet<Organization> Organizations => Set<Organization>();
         public DbSet<OrganizationMembership> OrganizationMemberships => Set<OrganizationMembership>();
-
+        public DbSet<Team> Teams => Set<Team>();
+        public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OrganizationMembership>(om =>
+            modelBuilder.Entity<OrganizationMembership>(entity =>
             {
-                om.HasKey(o => o.Id);
+                entity.HasKey(om => om.Id);
 
-                om.HasOne<Organization>()
-                  .WithMany()
-                  .HasForeignKey(o => o.OrganizationId)
-                  .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(om => om.Organization)
+                      .WithMany(o => o.OrganizationMemberships)
+                      .HasForeignKey(om => om.OrganizationId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
-                om.HasOne<User>()
-                  .WithMany()
-                  .HasForeignKey(o => o.UserId)
-                  .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(om => om.User)
+                      .WithMany(u => u.OrganizationMemberships)
+                      .HasForeignKey(om => om.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
-                om.HasOne<Role>()
-                  .WithMany()
-                  .HasForeignKey(o => o.RoleId)
-                  .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(om => om.Role)
+                      .WithMany(r => r.OrganizationMemberships)
+                      .HasForeignKey(om => om.RoleId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Team>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+
+                entity.HasOne(t => t.Organization)
+                      .WithMany(o => o.Teams)
+                      .HasForeignKey(t => t.OrganizationId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<TeamMember>(entity =>
+            {
+                entity.HasKey(tm => tm.Id);
+
+                entity.HasOne(tm => tm.Team)
+                      .WithMany(t => t.Members)
+                      .HasForeignKey(tm => tm.TeamId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(tm => tm.User)
+                      .WithMany(u => u.TeamMemberships)
+                      .HasForeignKey(tm => tm.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Role>().HasData(
@@ -86,6 +112,17 @@ namespace ProjectManager.Infrastructure.Data
                     OwnerId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                     CreatedAt = SeedDate,
                     UpdatedAt = SeedDate
+                }
+            );
+
+            modelBuilder.Entity<OrganizationMembership>().HasData(
+                new OrganizationMembership
+                {
+                    Id = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                    OrganizationId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                    UserId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                    RoleId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                    CreatedAt = SeedDate
                 }
             );
         }
