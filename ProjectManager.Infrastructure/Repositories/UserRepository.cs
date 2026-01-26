@@ -80,6 +80,16 @@ namespace ProjectManager.Infrastructure.Repositories
                 .AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
         }
 
+        public async Task AddMembershipAsync(OrganizationMembership membership, string roleName, CancellationToken ct = default)
+        {
+            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName, ct)
+                ?? throw new InvalidOperationException($"Role '{roleName}' not found.");
+
+            membership.RoleId = role.Id;
+            await _context.OrganizationMemberships.AddAsync(membership, ct);
+            await SaveChangesAsync(ct);
+        }
+
         private Task<int> SaveChangesAsync(CancellationToken ct = default) =>
             _context.SaveChangesAsync(ct);
     }

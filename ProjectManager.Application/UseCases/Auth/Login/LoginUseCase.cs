@@ -1,5 +1,4 @@
-﻿using ProjectManager.Application.DTOs;
-using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 
 namespace ProjectManager.Application.UseCases.Auth.Login

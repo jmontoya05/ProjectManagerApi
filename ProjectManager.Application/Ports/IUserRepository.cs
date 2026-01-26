@@ -14,5 +14,6 @@ namespace ProjectManager.Application.Ports
         Task<IEnumerable<string>> GetUserRolesByOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
         Task<IEnumerable<Organization>> GetUserOrganizationsAsync(Guid userId, CancellationToken ct = default);
         Task<bool> UserBelongsToOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
+        Task AddMembershipAsync(OrganizationMembership membership, string roleName, CancellationToken ct = default);
     }
 }
