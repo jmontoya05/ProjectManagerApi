@@ -1,6 +1,4 @@
 ﻿using ProjectManager.Application.DTOs;
-using ProjectManager.Application.DTOs.Requests;
-using ProjectManager.Application.DTOs.Responses;
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 

@@ -1,6 +1,4 @@
-﻿using ProjectManager.Application.DTOs.Requests;
-
-namespace ProjectManager.Application.UseCases.Teams.Create
+﻿namespace ProjectManager.Application.UseCases.Teams.Create
 {
     public interface ICreateTeamUseCase
     {

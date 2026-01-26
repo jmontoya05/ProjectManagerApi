@@ -1,5 +1,4 @@
-﻿using ProjectManager.Application.DTOs.Responses;
-using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.Teams.Get
 {
@@ -7,12 +6,12 @@ namespace ProjectManager.Application.UseCases.Teams.Get
     {
         private readonly ITeamRepository _teamRepository = teamRepository;
 
-        public async Task<TeamResponse> Execute(Guid teamId, CancellationToken ct = default)
+        public async Task<GetTeamByIdResponse> Execute(Guid teamId, CancellationToken ct = default)
         {
             var team = await _teamRepository.GetByIdAsync(teamId, ct)
                 ?? throw new InvalidOperationException("Team not found");
 
-            return new TeamResponse
+            return new GetTeamByIdResponse
             {
                 Id = team.Id,
                 Name = team.Name,

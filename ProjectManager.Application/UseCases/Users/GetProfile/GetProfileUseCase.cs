@@ -1,5 +1,4 @@
-﻿using ProjectManager.Application.DTOs;
-using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.Users.GetProfile
 {

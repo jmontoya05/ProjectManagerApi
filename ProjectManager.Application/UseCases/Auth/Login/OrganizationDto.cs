@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Application.DTOs
+﻿namespace ProjectManager.Application.UseCases.Auth.Login
 {
     public sealed class OrganizationDto
     {

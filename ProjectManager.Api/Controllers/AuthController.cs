@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
-using ProjectManager.Application.DTOs.Requests;
 using ProjectManager.Application.UseCases.Auth.Login;
 using ProjectManager.Application.UseCases.Auth.Logout;
 using ProjectManager.Application.UseCases.Auth.Refresh;

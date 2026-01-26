@@ -1,6 +1,4 @@
-﻿using ProjectManager.Application.DTOs;
-
-namespace ProjectManager.Application.UseCases.Users.GetProfile
+﻿namespace ProjectManager.Application.UseCases.Users.GetProfile
 {
     public interface IGetProfileUseCase
     {

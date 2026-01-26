@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Application.DTOs
+﻿namespace ProjectManager.Application.UseCases.Users.GetProfile
 {
     public sealed class UserDto
     {

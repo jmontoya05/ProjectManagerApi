@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Application.DTOs.Requests
+﻿namespace ProjectManager.Application.UseCases.Auth.SelectOrganization
 {
     public sealed class SelectOrganizationRequest
     {

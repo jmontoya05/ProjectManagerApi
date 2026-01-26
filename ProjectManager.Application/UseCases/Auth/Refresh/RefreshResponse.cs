@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Application.DTOs.Responses
+﻿namespace ProjectManager.Application.UseCases.Auth.Refresh
 {
     public sealed class RefreshResponse
     {

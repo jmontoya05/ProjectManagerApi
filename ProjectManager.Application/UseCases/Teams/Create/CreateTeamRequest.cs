@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Application.DTOs.Requests
+﻿namespace ProjectManager.Application.UseCases.Teams.Create
 {
     public sealed class CreateTeamRequest
     {

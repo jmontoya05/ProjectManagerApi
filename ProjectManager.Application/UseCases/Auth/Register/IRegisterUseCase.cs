@@ -1,6 +1,4 @@
-﻿using ProjectManager.Application.DTOs.Requests;
-
-namespace ProjectManager.Application.UseCases.Auth.Register
+﻿namespace ProjectManager.Application.UseCases.Auth.Register
 {
     public interface IRegisterUseCase
     {

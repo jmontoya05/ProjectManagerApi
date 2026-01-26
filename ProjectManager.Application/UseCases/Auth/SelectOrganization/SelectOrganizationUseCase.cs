@@ -1,6 +1,4 @@
-﻿using ProjectManager.Application.DTOs.Requests;
-using ProjectManager.Application.DTOs.Responses;
-using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 
 namespace ProjectManager.Application.UseCases.Auth.SelectOrganization

@@ -1,4 +1,4 @@
-﻿namespace ProjectManager.Application.DTOs.Requests
+﻿namespace ProjectManager.Application.UseCases.Auth.Login
 {
     public sealed class LoginRequest
     {

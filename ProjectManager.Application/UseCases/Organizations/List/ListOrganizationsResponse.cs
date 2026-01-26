@@ -1,6 +1,6 @@
-﻿namespace ProjectManager.Application.DTOs.Responses
+﻿namespace ProjectManager.Application.UseCases.Organizations.List
 {
-    public sealed class OrganizationResponse
+    public sealed class ListOrganizationsResponse
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;

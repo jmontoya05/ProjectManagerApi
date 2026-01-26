@@ -1,5 +1,4 @@
-﻿using ProjectManager.Application.DTOs.Responses;
-using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.Teams.List
 {
@@ -7,11 +6,11 @@ namespace ProjectManager.Application.UseCases.Teams.List
     {
         private readonly ITeamRepository _teamRepository = teamRepository;
 
-        public async Task<IEnumerable<TeamResponse>> Execute(Guid organizationId, CancellationToken ct = default)
+        public async Task<IEnumerable<ListTeamsResponse>> Execute(Guid organizationId, CancellationToken ct = default)
         {
             var teams = await _teamRepository.GetByOrganizationAsync(organizationId, ct);
 
-            return teams.Select(t => new TeamResponse
+            return teams.Select(t => new ListTeamsResponse
             {
                 Id = t.Id,
                 Name = t.Name,

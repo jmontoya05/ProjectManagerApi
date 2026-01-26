@@ -1,5 +1,4 @@
-﻿using ProjectManager.Application.DTOs.Requests;
-using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.Teams.Create

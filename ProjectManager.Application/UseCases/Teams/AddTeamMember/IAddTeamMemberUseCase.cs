@@ -1,6 +1,4 @@
-﻿using ProjectManager.Application.DTOs.Requests;
-
-namespace ProjectManager.Application.UseCases.Teams.AddTeamMember
+﻿namespace ProjectManager.Application.UseCases.Teams.AddTeamMember
 {
     public interface IAddTeamMemberUseCase
     {
