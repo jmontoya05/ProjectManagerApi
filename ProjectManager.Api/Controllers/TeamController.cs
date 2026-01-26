@@ -13,7 +13,7 @@ namespace ProjectManager.Api.Controllers
     [ApiController]
     [Route("org/{orgId}/teams")]
     [Authorize]
-    public class TeamController(ICreateTeamUseCase createTeamUseCase, IListTeamsUseCase listTeamsUseCase, IGetTeamByIdUseCase getTeamByIdUseCase, IAddTeamMemberUseCase addTeamMemberUseCase) : ControllerBase
+    public sealed class TeamController(ICreateTeamUseCase createTeamUseCase, IListTeamsUseCase listTeamsUseCase, IGetTeamByIdUseCase getTeamByIdUseCase, IAddTeamMemberUseCase addTeamMemberUseCase) : ControllerBase
     {
         private readonly ICreateTeamUseCase _createTeamUseCase = createTeamUseCase;
         private readonly IListTeamsUseCase _listTeamsUseCase = listTeamsUseCase;

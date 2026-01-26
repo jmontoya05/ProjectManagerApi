@@ -9,7 +9,7 @@ namespace ProjectManager.Api.Controllers
     [ApiController]
     [Route("users")]
     [Authorize]
-    public class UserController(IGetProfileUseCase getProfileUseCase) : ControllerBase
+    public sealed class UserController(IGetProfileUseCase getProfileUseCase) : ControllerBase
     {
         private readonly IGetProfileUseCase _getProfileUseCase = getProfileUseCase;
 

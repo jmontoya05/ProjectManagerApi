@@ -11,7 +11,7 @@ namespace ProjectManager.Api.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthController(IRegisterUseCase registerUseCase, ILoginUseCase loginUseCase, ISelectOrganizationUseCase selectOrganizationUseCase, IRefreshUseCase refreshUseCase, ILogoutUseCase logoutUseCase) : ControllerBase
+    public sealed class AuthController(IRegisterUseCase registerUseCase, ILoginUseCase loginUseCase, ISelectOrganizationUseCase selectOrganizationUseCase, IRefreshUseCase refreshUseCase, ILogoutUseCase logoutUseCase) : ControllerBase
     {
         private readonly IRegisterUseCase _registerUseCase = registerUseCase;
         private readonly ILoginUseCase _loginUseCase = loginUseCase;
