@@ -14,6 +14,7 @@ using ProjectManager.Application.UseCases.Organizations.Create;
 using ProjectManager.Application.UseCases.Organizations.Get;
 using ProjectManager.Application.UseCases.Organizations.List;
 using ProjectManager.Application.UseCases.Projects.Create;
+using ProjectManager.Application.UseCases.Projects.Get;
 using ProjectManager.Application.UseCases.Projects.List;
 using ProjectManager.Application.UseCases.Teams.AddTeamMember;
 using ProjectManager.Application.UseCases.Teams.Create;
@@ -87,6 +88,7 @@ builder.Services.AddScoped<IGetOrganizationByIdUseCase, GetOrganizationByIdUseCa
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<ICreateProjectUseCase, CreateProjectUseCase>();
 builder.Services.AddScoped<IListProjectsUseCase, ListProjectsUseCase>();
+builder.Services.AddScoped<IGetProjectByIdUseCase, GetProjectByIdUseCase>();
 
 var app = builder.Build();
 

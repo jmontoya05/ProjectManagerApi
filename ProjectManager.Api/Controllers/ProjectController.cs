@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.UseCases.Projects.Create;
+using ProjectManager.Application.UseCases.Projects.Get;
 using ProjectManager.Application.UseCases.Projects.List;
 using System.Security.Claims;
 
@@ -10,10 +11,11 @@ namespace ProjectManager.Api.Controllers
     [ApiController]
     [Route("org/{orgId}/projects")]
     [Authorize]
-    public sealed class ProjectController(ICreateProjectUseCase createProjectUseCase, IListProjectsUseCase listProjectsUseCase) : ControllerBase
+    public sealed class ProjectController(ICreateProjectUseCase createProjectUseCase, IListProjectsUseCase listProjectsUseCase, IGetProjectByIdUseCase getProjectByIdUseCase) : ControllerBase
     {
         private readonly ICreateProjectUseCase _createProjectUseCase = createProjectUseCase;
-        private readonly IListProjectsUseCase listProjectsUseCase = listProjectsUseCase;
+        private readonly IListProjectsUseCase _listProjectsUseCase = listProjectsUseCase;
+        private readonly IGetProjectByIdUseCase _getProjectByIdUseCase = getProjectByIdUseCase;
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateProjectRequest request, [FromRoute] Guid orgId)
@@ -37,7 +39,7 @@ namespace ProjectManager.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> List()
         {
             var orgIdClaim = User.FindFirst("OrganizationId")?.Value;
 
@@ -52,9 +54,41 @@ namespace ProjectManager.Api.Controllers
                     });
             }
 
-            var response = await listProjectsUseCase.Execute(organizationId);
+            var response = await _listProjectsUseCase.Execute(organizationId);
 
             return Ok(response);
+        }
+
+        [HttpGet("{projectId}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid projectId)
+        {
+            try
+            {
+                var project = await _getProjectByIdUseCase.Execute(projectId);
+                return Ok(project);
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                return NotFound(
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "PROJECT_NOT_FOUND",
+                        message = ex.Message
+                    });
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INTERNAL_ERROR",
+                        message = "An unexpected error occurred"
+                    });
+            }
         }
 
         private string GetCorrelationId() =>
