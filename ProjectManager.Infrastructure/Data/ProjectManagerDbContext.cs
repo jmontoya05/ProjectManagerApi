@@ -14,6 +14,7 @@ namespace ProjectManager.Infrastructure.Data
         public DbSet<OrganizationMembership> OrganizationMemberships => Set<OrganizationMembership>();
         public DbSet<Team> Teams => Set<Team>();
         public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
+        public DbSet<Project> Projects => Set<Project>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +60,21 @@ namespace ProjectManager.Infrastructure.Data
                 entity.HasOne(tm => tm.User)
                       .WithMany(u => u.TeamMemberships)
                       .HasForeignKey(tm => tm.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+
+                entity.HasOne(p => p.Organization)
+                      .WithMany(o => o.Projects)
+                      .HasForeignKey(p => p.OrganizationId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.Owner)
+                      .WithMany()
+                      .HasForeignKey(p => p.OwnerId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
 

@@ -121,17 +121,10 @@ namespace ProjectManager.Api.Controllers
         {
             try
             {
-                var orgClaim = User.FindFirst("OrganizationId")?.Value;
-
-                if (Guid.TryParse(orgClaim, out var organizationId))
-                {
-                    return BadRequest();
-                }
-
-                var response = await _refreshUseCase.Execute(request, organizationId);
+                var response = await _refreshUseCase.Execute(request);
                 return Ok(response);
             }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid or expired refresh token"))
+            catch (InvalidOperationException ex)
             {
                 return Unauthorized(
                     new
