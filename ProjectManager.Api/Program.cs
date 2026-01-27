@@ -11,6 +11,7 @@ using ProjectManager.Application.UseCases.Auth.Refresh;
 using ProjectManager.Application.UseCases.Auth.Register;
 using ProjectManager.Application.UseCases.Auth.SelectOrganization;
 using ProjectManager.Application.UseCases.Organizations.Create;
+using ProjectManager.Application.UseCases.Organizations.Get;
 using ProjectManager.Application.UseCases.Organizations.List;
 using ProjectManager.Application.UseCases.Teams.AddTeamMember;
 using ProjectManager.Application.UseCases.Teams.Create;
@@ -80,6 +81,7 @@ builder.Services.AddScoped<IAddTeamMemberUseCase, AddTeamMemberUseCase>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IListOrganizationsUseCase, ListOrganizationsUseCase>();
 builder.Services.AddScoped<ICreateOrganizationUseCase, CreateOrganizationUseCase>();
+builder.Services.AddScoped<IGetOrganizationByIdUseCase, GetOrganizationByIdUseCase>();
 
 var app = builder.Build();
 

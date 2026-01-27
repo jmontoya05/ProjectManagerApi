@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.UseCases.Organizations.Create;
+using ProjectManager.Application.UseCases.Organizations.Get;
 using ProjectManager.Application.UseCases.Organizations.List;
 using System.Security.Claims;
 
@@ -10,10 +11,11 @@ namespace ProjectManager.Api.Controllers
     [ApiController]
     [Route("organizations")]
     [Authorize]
-    public sealed class OrganizationController(IListOrganizationsUseCase listOrganizationsUseCase, ICreateOrganizationUseCase createOrganizationUseCase) : ControllerBase
+    public sealed class OrganizationController(IListOrganizationsUseCase listOrganizationsUseCase, ICreateOrganizationUseCase createOrganizationUseCase, IGetOrganizationByIdUseCase getOrganizationByIdUseCase) : ControllerBase
     {
         private readonly IListOrganizationsUseCase _listOrganizationsUseCase = listOrganizationsUseCase;
         private readonly ICreateOrganizationUseCase _createOrganizationUseCase = createOrganizationUseCase;
+        private readonly IGetOrganizationByIdUseCase _getOrganizationByIdUseCase = getOrganizationByIdUseCase;
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrganizationRequest request)
@@ -81,6 +83,38 @@ namespace ProjectManager.Api.Controllers
             {
                 var response = await _listOrganizationsUseCase.Execute(userId);
                 return Ok(response);
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INTERNAL_ERROR",
+                        message = "An unexpected error occurred"
+                    });
+            }
+        }
+
+        [HttpGet("{organizationId}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid organizationId)
+        {
+            try
+            {
+                var response = await _getOrganizationByIdUseCase.Execute(organizationId);
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+
+                return BadRequest(
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "BAD_REQUEST",
+                        message = ex.Message
+                    });
             }
             catch (Exception)
             {
