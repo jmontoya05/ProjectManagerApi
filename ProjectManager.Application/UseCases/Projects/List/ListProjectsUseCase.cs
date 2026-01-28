@@ -20,7 +20,9 @@ namespace ProjectManager.Application.UseCases.Projects.List
                     OrganizationId = p.OrganizationId,
                     OwnerId = p.OwnerId,
                     CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt
+                    CreatedBy = p.CreatedBy,
+                    UpdatedAt = p.UpdatedAt,
+                    UpdatedBy = p.UpdatedBy
                 });
         }
     }

@@ -23,7 +23,6 @@ namespace ProjectManager.Api.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (!Guid.TryParse(userIdClaim, out var userId))
-            {
                 return Unauthorized(
                     new
                     {
@@ -31,40 +30,63 @@ namespace ProjectManager.Api.Controllers
                         errorCode = "INVALID_TOKEN",
                         message = "Invalid token."
                     });
+
+            try
+            {
+                var projectId = await _createProjectUseCase.Execute(request, orgId, userId);
+                return CreatedAtAction(nameof(Create), new { id = projectId }, new { id = projectId });
             }
+            catch (InvalidOperationException ex)
+            {
 
-            var projectId = await _createProjectUseCase.Execute(request, orgId, userId);
-
-            return CreatedAtAction(nameof(Create), new { id = projectId }, new { id = projectId });
+                return NotFound(
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "ERROR",
+                        message = ex.Message
+                    });
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INTERNAL_ERROR",
+                        message = "An unexpected error occurred"
+                    });
+            }
         }
 
         [HttpGet]
-        public async Task<IActionResult> List()
-        {
-            var orgIdClaim = User.FindFirst("OrganizationId")?.Value;
-
-            if (!Guid.TryParse(orgIdClaim, out var organizationId))
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INVALID_TOKEN",
-                        message = "Invalid token."
-                    });
-            }
-
-            var response = await _listProjectsUseCase.Execute(organizationId);
-
-            return Ok(response);
-        }
-
-        [HttpGet("{projectId}")]
-        public async Task<IActionResult> GetById([FromRoute] Guid projectId)
+        public async Task<IActionResult> List([FromRoute] Guid orgId)
         {
             try
             {
-                var project = await _getProjectByIdUseCase.Execute(projectId);
+                var response = await _listProjectsUseCase.Execute(orgId);
+                return Ok(response);
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        correlationId = GetCorrelationId(),
+                        errorCode = "INTERNAL_ERROR",
+                        message = "An unexpected error occurred"
+                    });
+            }
+        }
+
+        [HttpGet("{projectId}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid orgId, [FromRoute] Guid projectId)
+        {
+            try
+            {
+                var project = await _getProjectByIdUseCase.Execute(projectId, orgId);
                 return Ok(project);
             }
             catch (InvalidOperationException ex)

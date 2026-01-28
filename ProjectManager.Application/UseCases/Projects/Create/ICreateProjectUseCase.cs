@@ -2,6 +2,6 @@
 {
     public interface ICreateProjectUseCase
     {
-        Task<Guid> Execute(CreateProjectRequest request, Guid organizationId, Guid userId, CancellationToken ct = default);
+        Task<Guid> Execute(CreateProjectRequest request, Guid organizationId, Guid currentUserId, CancellationToken ct = default);
     }
 }

@@ -9,7 +9,9 @@
         public Guid OrganizationId { get; set; }
         public Guid OwnerId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public Guid CreatedBy { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public Guid UpdatedBy { get; set; }
 
         // Navigation properties
         public virtual Organization Organization { get; set; } = null!;
