@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectManager.Domain.Entities;
 
-namespace ProjectManager.Infrastructure.Data
+namespace ProjectManager.Infrastructure.Persistence.Context
 {
     public class ProjectManagerDbContext(DbContextOptions<ProjectManagerDbContext> options) : DbContext(options)
     {

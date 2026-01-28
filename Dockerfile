@@ -12,13 +12,13 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ProjectManager.Api/ProjectManager.Api.csproj", "ProjectManager.Api/"]
-COPY ["ProjectManager.Application/ProjectManager.Application.csproj", "ProjectManager.Application/"]
-COPY ["ProjectManager.Contracts/ProjectManager.Contracts.csproj", "ProjectManager.Contracts/"]
-COPY ["ProjectManager.Domain/ProjectManager.Domain.csproj", "ProjectManager.Domain/"]
-COPY ["ProjectManager.Infrastructure/ProjectManager.Infrastructure.csproj", "ProjectManager.Infrastructure/"]
+COPY ["src/ProjectManager.Api/ProjectManager.Api.csproj", "ProjectManager.Api/"]
+COPY ["src/ProjectManager.Application/ProjectManager.Application.csproj", "ProjectManager.Application/"]
+COPY ["src/ProjectManager.Contracts/ProjectManager.Contracts.csproj", "ProjectManager.Contracts/"]
+COPY ["src/ProjectManager.Domain/ProjectManager.Domain.csproj", "ProjectManager.Domain/"]
+COPY ["src/ProjectManager.Infrastructure/ProjectManager.Infrastructure.csproj", "ProjectManager.Infrastructure/"]
 RUN dotnet restore "./ProjectManager.Api/ProjectManager.Api.csproj"
-COPY . .
+COPY src .
 WORKDIR "/src/ProjectManager.Api"
 RUN dotnet build "./ProjectManager.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
-using ProjectManager.Infrastructure.Data;
+using ProjectManager.Infrastructure.Persistence.Context;
 
-namespace ProjectManager.Infrastructure.Repositories
+namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
     public sealed class TeamMemberRepository(ProjectManagerDbContext context) : ITeamMemberRepository
     {
