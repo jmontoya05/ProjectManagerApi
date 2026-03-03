@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/solutionItems/">
     <File Path="Dockerfile" />
+    <File Path="README.md" />    
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ProjectManager.Api/ProjectManager.Api.csproj" />

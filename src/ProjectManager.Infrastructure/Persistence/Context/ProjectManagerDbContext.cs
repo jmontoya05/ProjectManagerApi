@@ -15,6 +15,7 @@ namespace ProjectManager.Infrastructure.Persistence.Context
         public DbSet<Team> Teams => Set<Team>();
         public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
         public DbSet<Project> Projects => Set<Project>();
+        public DbSet<WorkItem> WorkItems => Set<WorkItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

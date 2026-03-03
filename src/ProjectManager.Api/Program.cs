@@ -22,6 +22,7 @@ using ProjectManager.Application.UseCases.Teams.Create;
 using ProjectManager.Application.UseCases.Teams.Get;
 using ProjectManager.Application.UseCases.Teams.List;
 using ProjectManager.Application.UseCases.Users.GetProfile;
+using ProjectManager.Application.UseCases.WorkItems.List;
 using ProjectManager.Infrastructure.Persistence.Context;
 using ProjectManager.Infrastructure.Persistence.Repositories;
 using ProjectManager.Infrastructure.Services;
@@ -91,6 +92,8 @@ builder.Services.AddScoped<ICreateProjectUseCase, CreateProjectUseCase>();
 builder.Services.AddScoped<IListProjectsUseCase, ListProjectsUseCase>();
 builder.Services.AddScoped<IGetProjectByIdUseCase, GetProjectByIdUseCase>();
 builder.Services.AddScoped<IUpdateProjectUseCase, UpdateProjectUseCase>();
+builder.Services.AddScoped<IWorkItemRepository, WorkItemRepository>();
+builder.Services.AddScoped<IListWorkItemsUseCase, ListWorkItemsUseCase>();
 
 var app = builder.Build();
 
