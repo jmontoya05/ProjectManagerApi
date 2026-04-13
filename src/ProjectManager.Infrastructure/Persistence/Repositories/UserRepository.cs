@@ -90,6 +90,14 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
             await SaveChangesAsync(ct);
         }
 
+        public async Task<Project?> GetProjectByWorkItemIdAsync(Guid workItemId, CancellationToken ct = default)
+        {
+            return await _context.WorkItems
+                .Where(w => w.Id == workItemId)
+                .Select(w => w.Project)
+                .FirstOrDefaultAsync(ct);
+        }
+
         private Task<int> SaveChangesAsync(CancellationToken ct = default) =>
             _context.SaveChangesAsync(ct);
     }
