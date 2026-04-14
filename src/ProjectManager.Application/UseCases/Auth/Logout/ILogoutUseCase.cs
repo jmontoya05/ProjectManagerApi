@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Auth.Logout
+﻿using ProjectManager.Application.DTOs.Auth;
+
+namespace ProjectManager.Application.UseCases.Auth.Logout
 {
     public interface ILogoutUseCase
     {

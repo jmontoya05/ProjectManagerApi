@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Projects.Update
+﻿using ProjectManager.Application.DTOs.Projects;
+
+namespace ProjectManager.Application.UseCases.Projects.Update
 {
     public interface IUpdateProjectUseCase
     {

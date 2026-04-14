@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Organizations.Get
+﻿using ProjectManager.Application.DTOs.Organizations;
+
+namespace ProjectManager.Application.UseCases.Organizations.Get
 {
     public interface IGetOrganizationByIdUseCase
     {

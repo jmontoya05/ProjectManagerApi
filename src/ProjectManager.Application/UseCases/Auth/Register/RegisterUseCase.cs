@@ -1,4 +1,6 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Auth;
+using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.Auth.Register
@@ -11,7 +13,7 @@ namespace ProjectManager.Application.UseCases.Auth.Register
             var exists = await _userRepository.ExistsByEmailAsync(registerRequest.Email, ct);
 
             if (exists)
-                throw new InvalidOperationException("Email already registered.");
+                throw new EntityAlreadyExistsException("Email already registered.", "User");
 
             var user = new User
             {

@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Teams.List
+﻿using ProjectManager.Application.DTOs.Teams;
+
+namespace ProjectManager.Application.UseCases.Teams.List
 {
     public interface IListTeamsUseCase
     {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
+using ProjectManager.Application.DTOs.Organizations;
 using ProjectManager.Application.UseCases.Organizations.Create;
 using ProjectManager.Application.UseCases.Organizations.Get;
 using ProjectManager.Application.UseCases.Organizations.List;

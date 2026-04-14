@@ -17,47 +17,22 @@ namespace ProjectManager.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetMe()
         {
-            try
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!Guid.TryParse(userIdClaim, out var userId))
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if (!Guid.TryParse(userIdClaim, out var userId))
-                {
-                    return Unauthorized(
-                        new
-                        {
-                            correlationId = GetCorrelationId(),
-                            errorCode = "INVALID_TOKEN",
-                            message = "Invalid token."
-                        });
-                }
-
-                var profile = await _getProfileUseCase.Execute(userId);
-
-                return Ok(profile);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("User not found"))
-            {
-
-                return NotFound(
+                return Unauthorized(
                     new
                     {
                         correlationId = GetCorrelationId(),
-                        errorCode = "USER_NOT_FOUND",
-                        message = ex.Message
+                        errorCode = "INVALID_TOKEN",
+                        message = "Invalid token."
                     });
             }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+
+            var profile = await _getProfileUseCase.Execute(userId);
+
+            return Ok(profile);
         }
 
         private string GetCorrelationId() =>

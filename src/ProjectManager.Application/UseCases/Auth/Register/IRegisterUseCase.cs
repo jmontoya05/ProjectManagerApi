@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Auth.Register
+﻿using ProjectManager.Application.DTOs.Auth;
+
+namespace ProjectManager.Application.UseCases.Auth.Register
 {
     public interface IRegisterUseCase
     {

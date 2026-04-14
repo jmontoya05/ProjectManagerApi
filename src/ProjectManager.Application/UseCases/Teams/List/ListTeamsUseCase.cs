@@ -1,4 +1,5 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Teams;
+using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.Teams.List
 {

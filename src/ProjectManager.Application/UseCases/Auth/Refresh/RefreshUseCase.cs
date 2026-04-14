@@ -1,4 +1,5 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Auth;
+using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 
 namespace ProjectManager.Application.UseCases.Auth.Refresh

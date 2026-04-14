@@ -2,6 +2,9 @@
   <Folder Name="/solutionItems/">
     <File Path="Dockerfile" />
     <File Path="README.md" />    
+    <File Path="ARCHITECTURE_REFERENCE.md" />
+    <File Path="IMPLEMENTATION_PLAN.md" />
+    <File Path="START_HERE.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ProjectManager.Api/ProjectManager.Api.csproj" />
@@ -12,4 +15,3 @@
   </Folder>
   <Folder Name="/tests/" />
 </Solution>
-

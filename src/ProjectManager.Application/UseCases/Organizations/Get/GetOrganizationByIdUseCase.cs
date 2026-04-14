@@ -1,4 +1,5 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Organizations;
+using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.Organizations.Get
 {

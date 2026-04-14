@@ -1,4 +1,6 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Users;
+using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Users.GetProfile
 {
@@ -6,12 +8,12 @@ namespace ProjectManager.Application.UseCases.Users.GetProfile
     {
         private readonly IUserRepository _userRepository = userRepository;
 
-        public async Task<UserDto> Execute(Guid userId, CancellationToken ct = default)
+        public async Task<GetProfileResponse> Execute(Guid userId, CancellationToken ct = default)
         {
             var user = await _userRepository.GetByIdAsync(userId, ct)
-                ?? throw new InvalidOperationException("User not found");
+                ?? throw new NotFoundException("User not found", "User", userId);
 
-            return new UserDto
+            return new GetProfileResponse
             {
                 Id = user.Id,
                 Email = user.Email,

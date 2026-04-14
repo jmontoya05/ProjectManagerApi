@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Organizations.List
+﻿using ProjectManager.Application.DTOs.Organizations;
+
+namespace ProjectManager.Application.UseCases.Organizations.List
 {
     public interface IListOrganizationsUseCase
     {

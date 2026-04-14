@@ -1,4 +1,6 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Projects;
+using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.Projects.Create
@@ -11,10 +13,10 @@ namespace ProjectManager.Application.UseCases.Projects.Create
         public async Task<Guid> Execute(CreateProjectRequest request, Guid organizationId, Guid currentUserId, CancellationToken ct = default)
         {
             var owner = await _userRepository.GetByIdAsync(request.OwnerId, ct)
-                ?? throw new InvalidOperationException("Owner not found");
+                ?? throw new NotFoundException("Owner not found", "User", request.OwnerId);
 
             if (!await _userRepository.UserBelongsToOrganizationAsync(owner.Id, organizationId, ct))
-                throw new InvalidOperationException("Owner is not a member of this organization.");
+                throw new ForbiddenException("Owner is not a member of this organization.");
 
             var project = new Project
             {

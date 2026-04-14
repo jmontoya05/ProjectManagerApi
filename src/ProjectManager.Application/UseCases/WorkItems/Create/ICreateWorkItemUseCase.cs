@@ -1,4 +1,4 @@
-﻿using ProjectManager.Application.DTOs.WorkItems.Request;
+﻿using ProjectManager.Application.DTOs.WorkItems;
 
 namespace ProjectManager.Application.UseCases.WorkItems.Create
 {

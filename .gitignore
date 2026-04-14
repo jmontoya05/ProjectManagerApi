@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# Implementation planning documents (local tracking only)
+docs/
+
 # User-specific files
 *.rsuser
 *.suo

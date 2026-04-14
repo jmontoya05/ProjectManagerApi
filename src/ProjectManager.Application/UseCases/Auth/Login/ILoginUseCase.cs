@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Auth.Login
+﻿using ProjectManager.Application.DTOs.Auth;
+
+namespace ProjectManager.Application.UseCases.Auth.Login
 {
     public interface ILoginUseCase
     {

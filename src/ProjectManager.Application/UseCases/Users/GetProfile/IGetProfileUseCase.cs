@@ -1,7 +1,9 @@
-﻿namespace ProjectManager.Application.UseCases.Users.GetProfile
+﻿using ProjectManager.Application.DTOs.Users;
+
+namespace ProjectManager.Application.UseCases.Users.GetProfile
 {
     public interface IGetProfileUseCase
     {
-        Task<UserDto> Execute(Guid userId, CancellationToken ct = default);
+        Task<GetProfileResponse> Execute(Guid userId, CancellationToken ct = default);
     }
 }

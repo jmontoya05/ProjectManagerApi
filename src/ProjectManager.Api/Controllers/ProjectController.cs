@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Api.Middlewares;
+using ProjectManager.Application.DTOs.Projects;
 using ProjectManager.Application.UseCases.Projects.Create;
 using ProjectManager.Application.UseCases.Projects.Get;
 using ProjectManager.Application.UseCases.Projects.List;
@@ -30,94 +32,24 @@ namespace ProjectManager.Api.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (!Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INVALID_TOKEN",
-                        message = "Invalid token."
-                    });
+                throw new UnauthorizedException("Invalid token");
 
-            try
-            {
-                var projectId = await _createProjectUseCase.Execute(request, orgId, userId);
-                return CreatedAtAction(nameof(Create), new { id = projectId }, new { id = projectId });
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return NotFound(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "ERROR",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var projectId = await _createProjectUseCase.Execute(request, orgId, userId);
+            return CreatedAtAction(nameof(Create), new { id = projectId }, new { id = projectId });
         }
 
         [HttpGet]
         public async Task<IActionResult> List([FromRoute] Guid orgId)
         {
-            try
-            {
-                var response = await _listProjectsUseCase.Execute(orgId);
-                return Ok(response);
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var response = await _listProjectsUseCase.Execute(orgId);
+            return Ok(response);
         }
 
         [HttpGet("{projectId}")]
         public async Task<IActionResult> GetById([FromRoute] Guid orgId, [FromRoute] Guid projectId)
         {
-            try
-            {
-                var project = await _getProjectByIdUseCase.Execute(projectId, orgId);
-                return Ok(project);
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return NotFound(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "PROJECT_NOT_FOUND",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var project = await _getProjectByIdUseCase.Execute(projectId, orgId);
+            return Ok(project);
         }
 
         [HttpPut("{projectId}")]
@@ -126,41 +58,10 @@ namespace ProjectManager.Api.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (!Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INVALID_TOKEN",
-                        message = "Invalid token."
-                    });
+                throw new UnauthorizedException("Invalid token");
 
-            try
-            {
-                await _updateProjectUseCase.Execute(request, projectId, orgId, userId);
-                return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return NotFound(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "ERROR",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            await _updateProjectUseCase.Execute(request, projectId, orgId, userId);
+            return NoContent();
         }
 
         private string GetCorrelationId() =>

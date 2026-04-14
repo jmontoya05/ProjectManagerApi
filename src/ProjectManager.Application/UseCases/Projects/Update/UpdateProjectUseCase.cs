@@ -1,4 +1,6 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Projects;
+using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Projects.Update
 {
@@ -9,10 +11,10 @@ namespace ProjectManager.Application.UseCases.Projects.Update
         public async Task Execute(UpdateProjectRequest request, Guid projectId, Guid organizationId, Guid currentUserId, CancellationToken ct = default)
         {
             var project = await _projectRepository.GetByIdAsync(projectId, ct)
-                ?? throw new InvalidOperationException("Project not found");
+                ?? throw new NotFoundException("Project not found", "Project", projectId);
 
             if (project.OrganizationId != organizationId)
-                throw new InvalidOperationException("The project don't belong to the organization");
+                throw new ForbiddenException("The project doesn't belong to this organization");
 
             if (!string.IsNullOrWhiteSpace(request.Name))
                 project.Name = request.Name;

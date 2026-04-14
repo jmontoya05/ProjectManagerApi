@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Teams.AddTeamMember
+﻿using ProjectManager.Application.DTOs.Teams;
+
+namespace ProjectManager.Application.UseCases.Teams.AddTeamMember
 {
     public interface IAddTeamMemberUseCase
     {

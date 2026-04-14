@@ -1,4 +1,4 @@
-﻿using ProjectManager.Application.DTOs.WorkItems.Request;
+﻿using ProjectManager.Application.DTOs.WorkItems;
 using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.WorkItems.Update

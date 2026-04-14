@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
+using ProjectManager.Application.DTOs.Auth;
 using ProjectManager.Application.UseCases.Auth.Login;
 using ProjectManager.Application.UseCases.Auth.Logout;
 using ProjectManager.Application.UseCases.Auth.Refresh;
@@ -21,162 +22,36 @@ namespace ProjectManager.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            try
-            {
-                var userId = await _registerUseCase.Execute(request);
-                return CreatedAtAction(nameof(Register), new { id = userId }, new { id = userId });
-
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("already registered"))
-            {
-
-                return Conflict(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "EMAIL_ALREADY_EXISTS",
-                        message = "Email already registered"
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var userId = await _registerUseCase.Execute(request);
+            return CreatedAtAction(nameof(Register), new { id = userId }, new { id = userId });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            try
-            {
-                var response = await _loginUseCase.Execute(request);
-                return Ok(response);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("The email doesn't exists") ||
-                                                        ex.Message.Contains("Invalid password") ||
-                                                        ex.Message.Contains("User is blocked"))
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "UNAUTHORIZED",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var response = await _loginUseCase.Execute(request);
+            return Ok(response);
         }
 
         [HttpPost("organization")]
         public async Task<IActionResult> SelectOrganization([FromBody] SelectOrganizationRequest request)
         {
-            try
-            {
-                var response = await _selectOrganizationUse.Execute(request);
-                return Ok(response);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid or expired refresh token") ||
-                                                        ex.Message.Contains("User not in organization"))
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "UNAUTHORIZED",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var response = await _selectOrganizationUse.Execute(request);
+            return Ok(response);
         }
 
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
         {
-            try
-            {
-                var response = await _refreshUseCase.Execute(request);
-                return Ok(response);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INVALID_REFRESH",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var response = await _refreshUseCase.Execute(request);
+            return Ok(response);
         }
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
-            try
-            {
-                await _logoutUseCase.Execute(request);
-                return NoContent();
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid refresh token"))
-            {
-
-                return BadRequest(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INVALID_TOKEN",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            await _logoutUseCase.Execute(request);
+            return NoContent();
         }
 
         private string GetCorrelationId() =>

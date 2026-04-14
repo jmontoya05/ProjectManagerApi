@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Projects.List
+﻿using ProjectManager.Application.DTOs.Projects;
+
+namespace ProjectManager.Application.UseCases.Projects.List
 {
     public interface IListProjectsUseCase
     {

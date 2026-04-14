@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Projects.Create
+﻿using ProjectManager.Application.DTOs.Projects;
+
+namespace ProjectManager.Application.UseCases.Projects.Create
 {
     public interface ICreateProjectUseCase
     {

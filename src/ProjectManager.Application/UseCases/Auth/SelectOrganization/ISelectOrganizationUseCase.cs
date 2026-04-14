@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Auth.SelectOrganization
+﻿using ProjectManager.Application.DTOs.Auth;
+
+namespace ProjectManager.Application.UseCases.Auth.SelectOrganization
 {
     public interface ISelectOrganizationUseCase
     {

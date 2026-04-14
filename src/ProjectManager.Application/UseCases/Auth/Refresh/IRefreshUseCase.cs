@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Auth.Refresh
+﻿using ProjectManager.Application.DTOs.Auth;
+
+namespace ProjectManager.Application.UseCases.Auth.Refresh
 {
     public interface IRefreshUseCase
     {

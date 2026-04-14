@@ -1,5 +1,6 @@
-﻿using ProjectManager.Application.DTOs.WorkItems.Request;
+﻿using ProjectManager.Application.DTOs.WorkItems;
 using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.WorkItems.Create
@@ -13,25 +14,25 @@ namespace ProjectManager.Application.UseCases.WorkItems.Create
         public async Task<Guid> Execute(Guid projectId, CreateWorkItemRequest request, Guid currentUserId, CancellationToken ct = default)
         {
             var project = await _projectRepository.GetByIdAsync(projectId, ct)
-                ?? throw new InvalidOperationException("Project not found.");
+                ?? throw new NotFoundException("Project not found", "Project", projectId);
 
             if (request.ParentWorkItemId.HasValue)
             {
                 var parent = await _workItemRepository.GetByIdAsync(request.ParentWorkItemId.Value, ct)
-                    ?? throw new InvalidOperationException("Parent work item not found.");
+                    ?? throw new NotFoundException("Parent work item not found", "WorkItem", request.ParentWorkItemId.Value);
 
                 if (parent.ProjectId != projectId)
-                    throw new InvalidOperationException("Parent work item belongs to different project.");
+                    throw new BusinessRuleException("Parent work item belongs to a different project", "PARENT_PROJECT_MISMATCH");
             }
 
             if (request.AssigneeId.HasValue)
             {
                 _ = await _userRepository.GetByIdAsync(request.AssigneeId.Value, ct)
-                    ?? throw new InvalidOperationException("Assignee not found.");
+                    ?? throw new NotFoundException("Assignee not found", "User", request.AssigneeId.Value);
 
                 var assigneeRoles = await _userRepository.GetUserRolesByOrganizationAsync(request.AssigneeId.Value, project.OrganizationId, ct);
                 if (!assigneeRoles.Any())
-                    throw new InvalidOperationException("Assignee is not a member of this organization.");
+                    throw new ForbiddenException("Assignee is not a member of this organization");
             }
 
             var workItem = new WorkItem

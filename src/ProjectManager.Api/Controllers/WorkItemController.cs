@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.WorkItems;
-using ProjectManager.Application.DTOs.WorkItems.Request;
 using ProjectManager.Application.UseCases.WorkItems.Create;
 using ProjectManager.Application.UseCases.WorkItems.List;
 using ProjectManager.Application.UseCases.WorkItems.Update;
@@ -21,73 +20,32 @@ namespace ProjectManager.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> List([FromRoute] Guid projectId, [FromQuery] WorkItemFilter filter)
         {
-            try
-            {
-                var workItems = await _listWorkItemsUseCase.Execute(projectId, filter);
-                return Ok(workItems);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return NotFound(new { correlationId = GetCorrelationId(), errorCode = "NOT_FOUND", message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { correlationId = GetCorrelationId(), errorCode = "BAD_REQUEST", message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { correlationId = GetCorrelationId(), errorCode = "INTERNAL_ERROR", message = "An unexpected error occurred." });
-            }
+            var workItems = await _listWorkItemsUseCase.Execute(projectId, filter);
+            return Ok(workItems);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromRoute] Guid orgId, [FromRoute] Guid projectId, [FromBody] CreateWorkItemRequest request)
         {
-            try
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdClaim, out var userId))
-                    return Unauthorized(new { correlationId = GetCorrelationId(), errorCode = "INVALID_TOKEN", message = "Invalid token." });
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { correlationId = GetCorrelationId(), errorCode = "INVALID_TOKEN", message = "Invalid token." });
 
-                var workItemId = await _createWorkItemUseCase.Execute(projectId, request, userId);
+            var workItemId = await _createWorkItemUseCase.Execute(projectId, request, userId);
 
-                return CreatedAtAction(nameof(Create), new { orgId, projectId, id = workItemId }, new { id = workItemId });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { correlationId = GetCorrelationId(), errorCode = "BAD_REQUEST", message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { correlationId = GetCorrelationId(), errorCode = "BAD_REQUEST", message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { correlationId = GetCorrelationId(), errorCode = "INTERNAL_ERROR", message = "An unexpected error occurred." });
-            }
+            return CreatedAtAction(nameof(Create), new { orgId, projectId, id = workItemId }, new { id = workItemId });
         }
 
         [HttpPatch("{workItemId}/status")]
         public async Task<IActionResult> UpdateStatus([FromRoute] Guid workItemId, [FromBody] UpdateWorkItemStatusRequest request)
         {
-            try
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdClaim, out var userId))
-                    return Unauthorized(new { correlationId = GetCorrelationId(), errorCode = "INVALID_TOKEN", message = "Invalid token." });
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { correlationId = GetCorrelationId(), errorCode = "INVALID_TOKEN", message = "Invalid token." });
 
-                await _updateWorkItemStatusUseCase.Execute(workItemId, request, userId);
+            await _updateWorkItemStatusUseCase.Execute(workItemId, request, userId);
 
-                return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { correlationId = GetCorrelationId(), errorCode = "BAD_REQUEST", message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { correlationId = GetCorrelationId(), errorCode = "INTERNAL_ERROR", message = "An unexpected error occurred." });
-            }
+            return NoContent();
         }
 
         private string GetCorrelationId() =>

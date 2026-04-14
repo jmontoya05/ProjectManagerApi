@@ -24,4 +24,9 @@
     <ProjectReference Include="..\ProjectManager.Infrastructure\ProjectManager.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Authorization\Handlers\" />
+    <Folder Include="Authorization\Requirements\" />
+  </ItemGroup>
+
 </Project>

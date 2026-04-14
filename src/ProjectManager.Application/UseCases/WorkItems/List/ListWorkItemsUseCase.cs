@@ -1,6 +1,5 @@
 ﻿using ProjectManager.Application.DTOs;
 using ProjectManager.Application.DTOs.WorkItems;
-using ProjectManager.Application.DTOs.WorkItems.Response;
 using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.WorkItems.List

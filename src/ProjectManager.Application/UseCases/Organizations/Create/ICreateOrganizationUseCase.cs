@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Organizations.Create
+﻿using ProjectManager.Application.DTOs.Organizations;
+
+namespace ProjectManager.Application.UseCases.Organizations.Create
 {
     public interface ICreateOrganizationUseCase
     {

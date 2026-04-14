@@ -1,4 +1,6 @@
-﻿using ProjectManager.Application.Ports;
+﻿using ProjectManager.Application.DTOs.Projects;
+using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Projects.Get
 {
@@ -9,10 +11,10 @@ namespace ProjectManager.Application.UseCases.Projects.Get
         public async Task<GetProjectByIdResponse> Execute(Guid projectId, Guid organizationId, CancellationToken ct = default)
         {
             var project = await _projectRepository.GetByIdAsync(projectId, ct)
-                ?? throw new InvalidOperationException("Project no found");
+                ?? throw new NotFoundException("Project not found", "Project", projectId);
 
             if (project.OrganizationId != organizationId)
-                throw new InvalidOperationException("You do not have access to this project");
+                throw new ForbiddenException("You do not have access to this project");
     
             return new GetProjectByIdResponse
             {

@@ -1,4 +1,6 @@
-﻿namespace ProjectManager.Application.UseCases.Projects.Get
+﻿using ProjectManager.Application.DTOs.Projects;
+
+namespace ProjectManager.Application.UseCases.Projects.Get
 {
     public interface IGetProjectByIdUseCase
     {
