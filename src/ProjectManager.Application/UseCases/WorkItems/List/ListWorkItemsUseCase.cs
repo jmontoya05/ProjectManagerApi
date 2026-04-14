@@ -32,8 +32,12 @@ namespace ProjectManager.Application.UseCases.WorkItems.List
                 .ToList();
 
             var hasNextPage = items.Count > filter.PageSize;
+            string? nextCursor = null;
             if (hasNextPage)
+            {
                 items.RemoveAt(items.Count - 1);
+                nextCursor = items.Last().UpdatedAt.ToString("o");
+            }
 
             var workItemDtos = items.Select(w => new WorkItemResponse
             {
@@ -58,8 +62,8 @@ namespace ProjectManager.Application.UseCases.WorkItems.List
 
             return new PagedResponse<WorkItemResponse>
             {
-                Items = workItemDtos,
-                NextCursor = hasNextPage ? items[^1].UpdatedAt.ToString("o") : null
+                Items = workItemDtos.ToList(),
+                NextCursor = nextCursor
             };
         }
     }

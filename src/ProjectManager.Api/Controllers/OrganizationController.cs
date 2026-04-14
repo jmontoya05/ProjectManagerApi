@@ -22,115 +22,33 @@ namespace ProjectManager.Api.Controllers
         public async Task<IActionResult> Create([FromBody] CreateOrganizationRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (!Guid.TryParse(userIdClaim, out var userId))
             {
                 return Unauthorized(
                     new
                     {
-                        correlationId = GetCorrelationId(),
+                        correlationId = ExceptionHandlingMiddleware.GetCorrelationId(HttpContext),
                         errorCode = "INVALID_TOKEN",
                         message = "Invalid token."
                     });
             }
 
-            try
-            {
-                var response = await _createOrganizationUseCase.Execute(request, userId);
-
-                return CreatedAtAction(nameof(Create), new { id = response }, new { id = response });
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return BadRequest(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "BAD_REQUEST",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var response = await _createOrganizationUseCase.Execute(request, userId);
+            return CreatedAtAction(nameof(Create), new { id = response }, new { id = response });
         }
 
         [HttpGet]
         public async Task<IActionResult> ListByUser()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INVALID_TOKEN",
-                        message = "Invalid token."
-                    });
-            }
-
-            try
-            {
-                var response = await _listOrganizationsUseCase.Execute(userId);
-                return Ok(response);
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var response = await _listOrganizationsUseCase.Execute();
+            return Ok(response);
         }
 
         [HttpGet("{organizationId}")]
         public async Task<IActionResult> GetById([FromRoute] Guid organizationId)
         {
-            try
-            {
-                var response = await _getOrganizationByIdUseCase.Execute(organizationId);
-                return Ok(response);
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return BadRequest(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "BAD_REQUEST",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var response = await _getOrganizationByIdUseCase.Execute(organizationId);
+            return Ok(response);
         }
-
-        private string GetCorrelationId() =>
-            ExceptionHandlingMiddleware.GetCorrelationId(HttpContext);
     }
 }

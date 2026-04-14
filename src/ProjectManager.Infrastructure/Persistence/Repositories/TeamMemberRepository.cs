@@ -5,9 +5,14 @@ using ProjectManager.Infrastructure.Persistence.Context;
 
 namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
-    public sealed class TeamMemberRepository(ProjectManagerDbContext context) : ITeamMemberRepository
+    public sealed class TeamMemberRepository : ITeamMemberRepository
     {
-        private readonly ProjectManagerDbContext _context = context;
+        private readonly ProjectManagerDbContext _context;
+
+        public TeamMemberRepository(ProjectManagerDbContext context)
+        {
+            _context = context;
+        }
 
         public async Task AddMemberAsync(TeamMember member, CancellationToken ct = default)
         {
@@ -31,7 +36,6 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
                 _context.TeamMembers.Remove(member);
                 await SaveChangesAsync(ct);
             }
-
         }
 
         private Task<int> SaveChangesAsync(CancellationToken ct = default) =>

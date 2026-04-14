@@ -29,10 +29,6 @@ namespace ProjectManager.Application.UseCases.WorkItems.Create
             {
                 _ = await _userRepository.GetByIdAsync(request.AssigneeId.Value, ct)
                     ?? throw new NotFoundException("Assignee not found", "User", request.AssigneeId.Value);
-
-                var assigneeRoles = await _userRepository.GetUserRolesByOrganizationAsync(request.AssigneeId.Value, project.OrganizationId, ct);
-                if (!assigneeRoles.Any())
-                    throw new ForbiddenException("Assignee is not a member of this organization");
             }
 
             var workItem = new WorkItem

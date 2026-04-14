@@ -1,15 +1,18 @@
 ﻿using ProjectManager.Application.DTOs.Organizations;
 using ProjectManager.Application.Ports;
+using ProjectManager.Application.Services;
 
 namespace ProjectManager.Application.UseCases.Organizations.List
 {
-    public sealed class ListOrganizationsUseCase(IOrganizationRepository organizationRepository) : IListOrganizationsUseCase
+    public sealed class ListOrganizationsUseCase(IOrganizationRepository organizationRepository, ITenantContext tenantContext) : IListOrganizationsUseCase
     {
         private readonly IOrganizationRepository _organizationRepository = organizationRepository;
+        private readonly ITenantContext _tenantContext = tenantContext;
 
-        public async Task<IEnumerable<ListOrganizationsResponse>> Execute(Guid userId, CancellationToken ct = default)
+        public async Task<IEnumerable<ListOrganizationsResponse>> Execute(CancellationToken ct = default)
         {
-            var organizations = await _organizationRepository.GetByUserAsync(userId, ct);
+            var userId = _tenantContext.UserId != null ? Guid.Parse(_tenantContext.UserId) : Guid.Empty;
+            var organizations = await _organizationRepository.GetAllAsync(ct);
 
             return organizations
                 .Select(o => new ListOrganizationsResponse

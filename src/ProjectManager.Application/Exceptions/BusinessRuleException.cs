@@ -7,8 +7,8 @@ namespace ProjectManager.Application.Exceptions
                 message,
                 ruleCode ?? "BUSINESS_RULE_VIOLATION",
                 422,
-                details: ruleCode != null ? new Dictionary<string, object?> 
-                { 
+                details: ruleCode != null ? new Dictionary<string, object?>
+                {
                     ["ruleCode"] = ruleCode
                 } : null)
         {

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectManager.Application.Exceptions;
-using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.Projects;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.UseCases.Projects.Create;
 using ProjectManager.Application.UseCases.Projects.Get;
 using ProjectManager.Application.UseCases.Projects.List;
@@ -34,7 +33,7 @@ namespace ProjectManager.Api.Controllers
             if (!Guid.TryParse(userIdClaim, out var userId))
                 throw new UnauthorizedException("Invalid token");
 
-            var projectId = await _createProjectUseCase.Execute(request, orgId, userId);
+            var projectId = await _createProjectUseCase.Execute(request, userId);
             return CreatedAtAction(nameof(Create), new { id = projectId }, new { id = projectId });
         }
 
@@ -48,7 +47,7 @@ namespace ProjectManager.Api.Controllers
         [HttpGet("{projectId}")]
         public async Task<IActionResult> GetById([FromRoute] Guid orgId, [FromRoute] Guid projectId)
         {
-            var project = await _getProjectByIdUseCase.Execute(projectId, orgId);
+            var project = await _getProjectByIdUseCase.Execute(projectId);
             return Ok(project);
         }
 
@@ -63,8 +62,5 @@ namespace ProjectManager.Api.Controllers
             await _updateProjectUseCase.Execute(request, projectId, orgId, userId);
             return NoContent();
         }
-
-        private string GetCorrelationId() =>
-                ExceptionHandlingMiddleware.GetCorrelationId(HttpContext);
     }
 }

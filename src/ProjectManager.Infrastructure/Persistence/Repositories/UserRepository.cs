@@ -1,13 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectManager.Application.Ports;
+using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
 using ProjectManager.Infrastructure.Persistence.Context;
 
 namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
-    public sealed class UserRepository(ProjectManagerDbContext context) : IUserRepository
+    public sealed class UserRepository : IUserRepository
     {
-        private readonly ProjectManagerDbContext _context = context;
+        private readonly ProjectManagerDbContext _context;
+
+        public UserRepository(ProjectManagerDbContext context)
+        {
+            _context = context;
+        }
 
         public async Task AddAsync(User user, CancellationToken ct = default)
         {
@@ -59,43 +65,34 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
                 .Select(om => om.Role.Name)
                 .ToListAsync(ct);
 
-            return roles.Distinct();
+            return roles;
         }
 
         public async Task<IEnumerable<Organization>> GetUserOrganizationsAsync(Guid userId, CancellationToken ct = default)
         {
-            var query = _context.OrganizationMemberships
-                .Where(om => om.UserId == userId);
-
-            var organizations = await query
-                .Select(om => om.Organization)
+            var memberships = await _context.OrganizationMemberships
+                .Where(om => om.UserId == userId)
+                .Include(om => om.Organization)
                 .ToListAsync(ct);
-
-            return organizations.Distinct();
+            return memberships.Select(om => om.Organization).Distinct();
         }
 
         public async Task<bool> UserBelongsToOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default)
         {
-            return await _context.OrganizationMemberships
-                .AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
+            return await _context.OrganizationMemberships.AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
         }
 
         public async Task AddMembershipAsync(OrganizationMembership membership, string roleName, CancellationToken ct = default)
         {
-            var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName, ct)
-                ?? throw new InvalidOperationException($"Role '{roleName}' not found.");
-
-            membership.RoleId = role.Id;
             await _context.OrganizationMemberships.AddAsync(membership, ct);
             await SaveChangesAsync(ct);
         }
 
         public async Task<Project?> GetProjectByWorkItemIdAsync(Guid workItemId, CancellationToken ct = default)
         {
-            return await _context.WorkItems
-                .Where(w => w.Id == workItemId)
-                .Select(w => w.Project)
-                .FirstOrDefaultAsync(ct);
+            var workItem = await _context.WorkItems.FirstOrDefaultAsync(wi => wi.Id == workItemId, ct);
+            if (workItem == null) return null;
+            return await _context.Projects.FirstOrDefaultAsync(p => p.Id == workItem.ProjectId, ct);
         }
 
         private Task<int> SaveChangesAsync(CancellationToken ct = default) =>

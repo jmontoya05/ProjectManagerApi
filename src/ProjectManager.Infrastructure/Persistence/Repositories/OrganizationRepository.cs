@@ -2,12 +2,20 @@
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 using ProjectManager.Infrastructure.Persistence.Context;
+using ProjectManager.Application.Services;
 
 namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
-    public sealed class OrganizationRepository(ProjectManagerDbContext context) : IOrganizationRepository
+    public sealed class OrganizationRepository : IOrganizationRepository
     {
-        private readonly ProjectManagerDbContext _context = context;
+        private readonly ProjectManagerDbContext _context;
+        private readonly ITenantContext _tenantContext;
+
+        public OrganizationRepository(ProjectManagerDbContext context, ITenantContext tenantContext)
+        {
+            _context = context;
+            _tenantContext = tenantContext;
+        }
 
         public async Task AddAsync(Organization organization, CancellationToken ct = default)
         {
@@ -18,8 +26,9 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
         public async Task<Organization?> GetByIdAsync(Guid organizationId, CancellationToken ct = default) =>
             await _context.Organizations.FirstOrDefaultAsync(o => o.Id == organizationId, ct);
 
-        public async Task<IEnumerable<Organization>> GetByUserAsync(Guid userId, CancellationToken ct = default)
+        public async Task<IEnumerable<Organization>> GetAllAsync(CancellationToken ct = default)
         {
+            var userId = Guid.Parse(_tenantContext.UserId!);
             var memberships = await _context.OrganizationMemberships
                 .Where(om => om.UserId == userId)
                 .Include(om => om.Organization)

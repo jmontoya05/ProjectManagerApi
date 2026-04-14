@@ -1,5 +1,6 @@
 ﻿using ProjectManager.Application.DTOs.Organizations;
 using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Organizations.Get
 {
@@ -10,7 +11,7 @@ namespace ProjectManager.Application.UseCases.Organizations.Get
         public async Task<GetOrganizationByIdResponse> Execute(Guid organizationId, CancellationToken ct = default)
         {
             var organization = await _organizationRepository.GetByIdAsync(organizationId, ct)
-                ?? throw new InvalidOperationException("Organization not found");
+                ?? throw new NotFoundException("Organization not found", "Organization", organizationId);
 
             return new GetOrganizationByIdResponse
             {

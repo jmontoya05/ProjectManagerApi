@@ -1,10 +1,13 @@
 <Solution>
   <Folder Name="/solutionItems/">
     <File Path="Dockerfile" />
+    <File Path=".dockerignore" />
+    <File Path=".gitignore" />
     <File Path="README.md" />    
+  </Folder>
+  <Folder Name="/docs/">
     <File Path="ARCHITECTURE_REFERENCE.md" />
     <File Path="IMPLEMENTATION_PLAN.md" />
-    <File Path="START_HERE.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ProjectManager.Api/ProjectManager.Api.csproj" />

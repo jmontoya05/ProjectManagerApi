@@ -5,9 +5,14 @@ using ProjectManager.Infrastructure.Persistence.Context;
 
 namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
-    public sealed class WorkItemRepository(ProjectManagerDbContext context) : IWorkItemRepository
+    public sealed class WorkItemRepository : IWorkItemRepository
     {
-        private readonly ProjectManagerDbContext _context = context;
+        private readonly ProjectManagerDbContext _context;
+
+        public WorkItemRepository(ProjectManagerDbContext context)
+        {
+            _context = context;
+        }
 
         public async Task AddAsync(WorkItem workItem, CancellationToken ct = default)
         {

@@ -8,14 +8,12 @@ namespace ProjectManager.Application.UseCases.Projects.Get
     {
         private readonly IProjectRepository _projectRepository = projectRepository;
 
-        public async Task<GetProjectByIdResponse> Execute(Guid projectId, Guid organizationId, CancellationToken ct = default)
+        public async Task<GetProjectByIdResponse> Execute(Guid projectId, CancellationToken ct = default)
         {
             var project = await _projectRepository.GetByIdAsync(projectId, ct)
                 ?? throw new NotFoundException("Project not found", "Project", projectId);
 
-            if (project.OrganizationId != organizationId)
-                throw new ForbiddenException("You do not have access to this project");
-    
+
             return new GetProjectByIdResponse
             {
                 Id = project.Id,

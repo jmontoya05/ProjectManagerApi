@@ -7,9 +7,9 @@ namespace ProjectManager.Application.UseCases.Teams.List
     {
         private readonly ITeamRepository _teamRepository = teamRepository;
 
-        public async Task<IEnumerable<ListTeamsResponse>> Execute(Guid organizationId, CancellationToken ct = default)
+        public async Task<IEnumerable<ListTeamsResponse>> Execute(CancellationToken ct = default)
         {
-            var teams = await _teamRepository.GetByOrganizationAsync(organizationId, ct);
+            var teams = await _teamRepository.GetAllAsync(ct);
 
             return teams.Select(t => new ListTeamsResponse
             {

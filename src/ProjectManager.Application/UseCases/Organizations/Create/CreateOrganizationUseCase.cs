@@ -1,5 +1,6 @@
 ﻿using ProjectManager.Application.DTOs.Organizations;
 using ProjectManager.Application.Ports;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.Organizations.Create
@@ -12,10 +13,10 @@ namespace ProjectManager.Application.UseCases.Organizations.Create
         public async Task<Guid> Execute(CreateOrganizationRequest request, Guid userId, CancellationToken ct = default)
         {
             var user = await _userRepository.GetByIdAsync(userId, ct)
-                ?? throw new InvalidOperationException("User not found.");
+                ?? throw new NotFoundException("User not found.", "User", userId);
 
             if (user.Status != "Active")
-                throw new InvalidOperationException("User is not active.");
+                throw new BusinessRuleException("User is not active.", "USER_NOT_ACTIVE");
 
             var organization = new Organization
             {

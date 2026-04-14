@@ -9,7 +9,7 @@ namespace ProjectManager.Application.UseCases.Projects.List
 
         public async Task<IEnumerable<ListProjectsResponse>> Execute(Guid organizationId, CancellationToken ct = default)
         {
-            var projects = await _projectRepository.GetAllByOrganizationIdAsync(organizationId, ct);
+            var projects = await _projectRepository.GetAllAsync(ct);
 
             return projects
                 .Select(p => new ListProjectsResponse

@@ -98,6 +98,8 @@ builder.Services.AddScoped<IWorkItemRepository, WorkItemRepository>();
 builder.Services.AddScoped<IListWorkItemsUseCase, ListWorkItemsUseCase>();
 builder.Services.AddScoped<ICreateWorkItemUseCase, CreateWorkItemUseCase>();
 builder.Services.AddScoped<IUpdateWorkItemStatusUseCase, UpdateWorkItemStatusUseCase>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 var app = builder.Build();
 
@@ -116,8 +118,6 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthentication();
-
-app.UseMiddleware<OrganizationMiddleware>();
 
 app.UseAuthorization();
 

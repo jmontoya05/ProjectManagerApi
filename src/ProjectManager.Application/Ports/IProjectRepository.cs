@@ -6,7 +6,7 @@ namespace ProjectManager.Application.Ports
     {
         Task Addasync(Project project, CancellationToken ct = default);
         Task<Project?> GetByIdAsync(Guid projectId, CancellationToken ct = default);
-        Task<IEnumerable<Project>> GetAllByOrganizationIdAsync(Guid organizationId, CancellationToken ct = default);
+        Task<IEnumerable<Project>> GetAllAsync(CancellationToken ct = default);
         Task UpdateAsync(Project project, CancellationToken ct = default);
     }
 }

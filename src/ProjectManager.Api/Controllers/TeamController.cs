@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.Teams;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.UseCases.Teams.AddTeamMember;
 using ProjectManager.Application.UseCases.Teams.Create;
 using ProjectManager.Application.UseCases.Teams.Get;
@@ -31,54 +32,15 @@ namespace ProjectManager.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> List([FromRoute] Guid orgId)
         {
-            try
-            {
-                var teams = await _listTeamsUseCase.Execute(orgId);
-                return Ok(teams);
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var teams = await _listTeamsUseCase.Execute();
+            return Ok(teams);
         }
 
         [HttpGet("{teamId}")]
         public async Task<IActionResult> GetById([FromRoute] Guid teamId)
         {
-            try
-            {
-                var team = await _getTeamByIdUseCase.Execute(teamId);
-                return Ok(team);
-            }
-            catch (InvalidOperationException ex) when (ex.Message.Contains("Team not found"))
-            {
-
-                return NotFound(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "TEAM_NOT_FOUND",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            var team = await _getTeamByIdUseCase.Execute(teamId);
+            return Ok(team);
         }
 
         [HttpPost("{teamId}/members")]
@@ -97,34 +59,9 @@ namespace ProjectManager.Api.Controllers
                     });
             }
 
-            try
-            {
-                await _addTeamMemberUseCase.Execute(request, teamId, userId);
+            await _addTeamMemberUseCase.Execute(request, teamId, userId);
 
-                return NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return NotFound(
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "ERROR",
-                        message = ex.Message
-                    });
-            }
-            catch (Exception)
-            {
-                return StatusCode(
-                    500,
-                    new
-                    {
-                        correlationId = GetCorrelationId(),
-                        errorCode = "INTERNAL_ERROR",
-                        message = "An unexpected error occurred"
-                    });
-            }
+            return NoContent();
         }
 
         private string GetCorrelationId() =>
