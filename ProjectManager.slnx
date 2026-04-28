@@ -1,14 +1,4 @@
 <Solution>
-  <Folder Name="/solutionItems/">
-    <File Path="Dockerfile" />
-    <File Path=".dockerignore" />
-    <File Path=".gitignore" />
-    <File Path="README.md" />    
-  </Folder>
-  <Folder Name="/docs/">
-    <File Path="ARCHITECTURE_REFERENCE.md" />
-    <File Path="IMPLEMENTATION_PLAN.md" />
-  </Folder>
   <Folder Name="/src/">
     <Project Path="src/ProjectManager.Api/ProjectManager.Api.csproj" />
     <Project Path="src/ProjectManager.Application/ProjectManager.Application.csproj" />
@@ -16,5 +6,4 @@
     <Project Path="src/ProjectManager.Domain/ProjectManager.Domain.csproj" />
     <Project Path="src/ProjectManager.Infrastructure/ProjectManager.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/tests/" />
 </Solution>

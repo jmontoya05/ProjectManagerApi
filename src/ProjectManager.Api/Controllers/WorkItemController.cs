@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.WorkItems;
 using ProjectManager.Application.UseCases.WorkItems.Create;
@@ -9,9 +10,13 @@ using System.Security.Claims;
 namespace ProjectManager.Api.Controllers
 {
     [ApiController]
-    [Route("organizations/{orgId}/projects/{projectId}/workitems")]
-    //[Authorize(Policy = "ProjectMember")]
-    public sealed class WorkItemController(IListWorkItemsUseCase listWorkItemsUseCase, ICreateWorkItemUseCase createWorkItemUseCase, IUpdateWorkItemStatusUseCase updateWorkItemStatusUseCase) : ControllerBase
+    [Route("organizations/{orgId:guid}/projects/{projectId:guid}/workitems")]
+    [Authorize(Policy = "ProjectMember")]
+    public sealed class WorkItemController(
+        IListWorkItemsUseCase listWorkItemsUseCase, 
+        ICreateWorkItemUseCase createWorkItemUseCase, 
+        IUpdateWorkItemStatusUseCase updateWorkItemStatusUseCase
+    ) : ControllerBase
     {
         private readonly IListWorkItemsUseCase _listWorkItemsUseCase = listWorkItemsUseCase;
         private readonly ICreateWorkItemUseCase _createWorkItemUseCase = createWorkItemUseCase;
@@ -25,23 +30,37 @@ namespace ProjectManager.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "ProjectManager")]
         public async Task<IActionResult> Create([FromRoute] Guid orgId, [FromRoute] Guid projectId, [FromBody] CreateWorkItemRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized(new { correlationId = GetCorrelationId(), errorCode = "INVALID_TOKEN", message = "Invalid token." });
+                return Unauthorized(
+                    new 
+                    {
+                        correlationId = GetCorrelationId(), 
+                        errorCode = "INVALID_TOKEN", 
+                        message = "Invalid token."
+                    });
 
             var workItemId = await _createWorkItemUseCase.Execute(projectId, request, userId);
 
             return CreatedAtAction(nameof(Create), new { orgId, projectId, id = workItemId }, new { id = workItemId });
         }
 
-        [HttpPatch("{workItemId}/status")]
+        [HttpPatch("{workItemId:guid}/status")]
+        [Authorize(Policy = "ProjectManager")]
         public async Task<IActionResult> UpdateStatus([FromRoute] Guid workItemId, [FromBody] UpdateWorkItemStatusRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!Guid.TryParse(userIdClaim, out var userId))
-                return Unauthorized(new { correlationId = GetCorrelationId(), errorCode = "INVALID_TOKEN", message = "Invalid token." });
+                return Unauthorized(
+                    new 
+                    {
+                        correlationId = GetCorrelationId(), 
+                        errorCode = "INVALID_TOKEN", 
+                        message = "Invalid token."
+                    });
 
             await _updateWorkItemStatusUseCase.Execute(workItemId, request, userId);
 

@@ -1,30 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ProjectManager.Api.Middlewares;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Application.DTOs.Auth;
+using ProjectManager.Application.UseCases.Auth.Invite;
 using ProjectManager.Application.UseCases.Auth.Login;
 using ProjectManager.Application.UseCases.Auth.Logout;
 using ProjectManager.Application.UseCases.Auth.Refresh;
-using ProjectManager.Application.UseCases.Auth.Register;
 using ProjectManager.Application.UseCases.Auth.SelectOrganization;
 
 namespace ProjectManager.Api.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public sealed class AuthController(IRegisterUseCase registerUseCase, ILoginUseCase loginUseCase, ISelectOrganizationUseCase selectOrganizationUseCase, IRefreshUseCase refreshUseCase, ILogoutUseCase logoutUseCase) : ControllerBase
+    public sealed class AuthController(
+        ILoginUseCase loginUseCase, 
+        ISelectOrganizationUseCase selectOrganizationUseCase, 
+        IRefreshUseCase refreshUseCase, 
+        ILogoutUseCase logoutUseCase, 
+        IInviteUserUseCase inviteUserUseCase, 
+        ICompleteInvitationUseCase completeInvitationUseCase
+    ) : ControllerBase
     {
-        private readonly IRegisterUseCase _registerUseCase = registerUseCase;
         private readonly ILoginUseCase _loginUseCase = loginUseCase;
         private readonly ISelectOrganizationUseCase _selectOrganizationUse = selectOrganizationUseCase;
         private readonly IRefreshUseCase _refreshUseCase = refreshUseCase;
         private readonly ILogoutUseCase _logoutUseCase = logoutUseCase;
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            var userId = await _registerUseCase.Execute(request);
-            return CreatedAtAction(nameof(Register), new { id = userId }, new { id = userId });
-        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -54,7 +53,19 @@ namespace ProjectManager.Api.Controllers
             return NoContent();
         }
 
-        private string GetCorrelationId() =>
-            ExceptionHandlingMiddleware.GetCorrelationId(HttpContext);
+        [HttpPost("invite")]
+        public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request)
+        {
+            var adminUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var response = await inviteUserUseCase.Execute(request, adminUserId);
+            return Ok(response);
+        }
+
+        [HttpPost("complete-invitation")]
+        public async Task<IActionResult> CompleteInvitation([FromBody] CompleteInvitationRequest request)
+        {
+            var userId = await completeInvitationUseCase.Execute(request);
+            return Ok(new { UserId = userId });
+        }
     }
 }

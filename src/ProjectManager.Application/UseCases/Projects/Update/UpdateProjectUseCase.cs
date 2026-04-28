@@ -4,7 +4,9 @@ using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Projects.Update
 {
-    public sealed class UpdateProjectUseCase(IProjectRepository projectRepository) : IUpdateProjectUseCase
+    public sealed class UpdateProjectUseCase(
+        IProjectRepository projectRepository
+    ) : IUpdateProjectUseCase
     {
         private readonly IProjectRepository _projectRepository = projectRepository;
 
@@ -12,9 +14,6 @@ namespace ProjectManager.Application.UseCases.Projects.Update
         {
             var project = await _projectRepository.GetByIdAsync(projectId, ct)
                 ?? throw new NotFoundException("Project not found", "Project", projectId);
-
-            if (project.OrganizationId != organizationId)
-                throw new ForbiddenException("The project doesn't belong to this organization");
 
             if (!string.IsNullOrWhiteSpace(request.Name))
                 project.Name = request.Name;

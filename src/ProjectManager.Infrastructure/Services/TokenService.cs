@@ -7,25 +7,29 @@ using System.Text;
 
 namespace ProjectManager.Infrastructure.Services
 {
-    public sealed class TokenService(IConfiguration configuration) : ITokenService
+    public sealed class TokenService(
+        IConfiguration configuration
+    ) : ITokenService
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public string GenerateAccessToken(Guid userId, string email, Guid organizationId, IEnumerable<string> roles)
+        public string GenerateAccessToken(Guid userId, string email, Guid organizationId, IEnumerable<string> roles, IEnumerable<string>? permissions = null)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new(JwtRegisteredClaimNames.Email, email.ToString()),
+                new(JwtRegisteredClaimNames.Email, email),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("OrganizationId", organizationId.ToString())
             };
+            
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            foreach (var role in roles)
+            if (permissions != null)
             {
-                claims.Add(new(ClaimTypes.Role, role));
+                claims.AddRange(permissions.Select(permission => new Claim("Permission", permission)));
             }
 
             var token = new JwtSecurityToken(
@@ -33,7 +37,8 @@ namespace ProjectManager.Infrastructure.Services
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(60),
-                signingCredentials: credentials);
+                signingCredentials: credentials
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

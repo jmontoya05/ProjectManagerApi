@@ -11,14 +11,19 @@ namespace ProjectManager.Api.Controllers
 {
     [ApiController]
     [Route("organizations")]
-    [Authorize]
-    public sealed class OrganizationController(IListOrganizationsUseCase listOrganizationsUseCase, ICreateOrganizationUseCase createOrganizationUseCase, IGetOrganizationByIdUseCase getOrganizationByIdUseCase) : ControllerBase
+    [Authorize(Policy = "OrgAdmin")]
+    public sealed class OrganizationController(
+        IListOrganizationsUseCase listOrganizationsUseCase, 
+        ICreateOrganizationUseCase createOrganizationUseCase, 
+        IGetOrganizationByIdUseCase getOrganizationByIdUseCase
+    ) : ControllerBase
     {
         private readonly IListOrganizationsUseCase _listOrganizationsUseCase = listOrganizationsUseCase;
         private readonly ICreateOrganizationUseCase _createOrganizationUseCase = createOrganizationUseCase;
         private readonly IGetOrganizationByIdUseCase _getOrganizationByIdUseCase = getOrganizationByIdUseCase;
 
         [HttpPost]
+        [Authorize(Policy = "OrgOwner")]
         public async Task<IActionResult> Create([FromBody] CreateOrganizationRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -38,6 +43,7 @@ namespace ProjectManager.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "OrgMember")]
         public async Task<IActionResult> ListByUser()
         {
             var response = await _listOrganizationsUseCase.Execute();
@@ -45,6 +51,7 @@ namespace ProjectManager.Api.Controllers
         }
 
         [HttpGet("{organizationId}")]
+        [Authorize(Policy = "OrgMember")]
         public async Task<IActionResult> GetById([FromRoute] Guid organizationId)
         {
             var response = await _getOrganizationByIdUseCase.Execute(organizationId);

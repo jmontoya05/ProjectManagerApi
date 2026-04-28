@@ -8,11 +8,13 @@ namespace ProjectManager.Api.Controllers
 {
     [ApiController]
     [Route("users")]
-    [Authorize]
-    public sealed class UserController(IGetProfileUseCase getProfileUseCase) : ControllerBase
+    [Authorize(Policy = "OrgMember")]
+    public sealed class UserController(
+        IGetProfileUseCase getProfileUseCase
+    ) : ControllerBase
     {
         private readonly IGetProfileUseCase _getProfileUseCase = getProfileUseCase;
-
+        
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetMe()
@@ -24,7 +26,7 @@ namespace ProjectManager.Api.Controllers
                 return Unauthorized(
                     new
                     {
-                        correlationId = GetCorrelationId(),
+                        correlationId = ExceptionHandlingMiddleware.GetCorrelationId(HttpContext),
                         errorCode = "INVALID_TOKEN",
                         message = "Invalid token."
                     });
@@ -34,8 +36,5 @@ namespace ProjectManager.Api.Controllers
 
             return Ok(profile);
         }
-
-        private string GetCorrelationId() =>
-            ExceptionHandlingMiddleware.GetCorrelationId(HttpContext);
     }
 }

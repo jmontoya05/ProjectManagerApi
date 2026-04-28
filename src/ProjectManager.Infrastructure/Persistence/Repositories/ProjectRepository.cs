@@ -6,17 +6,14 @@ using ProjectManager.Infrastructure.Persistence.Context;
 
 namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
-    public sealed class ProjectRepository : IProjectRepository
+    public sealed class ProjectRepository(
+        ProjectManagerDbContext context, 
+        ITenantContext tenantContext
+    ) : IProjectRepository
     {
-        private readonly ProjectManagerDbContext _context;
-        private readonly ITenantContext _tenantContext;
-
-        public ProjectRepository(ProjectManagerDbContext context, ITenantContext tenantContext)
-        {
-            _context = context;
-            _tenantContext = tenantContext;
-        }
-
+        private readonly ProjectManagerDbContext _context = context;
+        private readonly ITenantContext _tenantContext = tenantContext;
+        
         public async Task Addasync(Project project, CancellationToken ct = default)
         {
             project.OrganizationId = Guid.Parse(_tenantContext.OrganizationId!);
@@ -35,9 +32,25 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
 
         public async Task UpdateAsync(Project project, CancellationToken ct = default)
         {
-            // Optionally, ensure project.OrganizationId matches tenant
             _context.Projects.Update(project);
             await SaveChangesAsync(ct);
+        }
+
+        public async Task AddMembershipAsync(ProjectMembership membership, CancellationToken ct = default)
+        {
+            await _context.ProjectMemberships.AddAsync(membership, ct);
+            await SaveChangesAsync(ct);
+        }
+
+        public async Task RemoveMembershipAsync(Guid userId, Guid projectId, CancellationToken ct = default)
+        {
+            var membership = await _context.ProjectMemberships
+                .FirstOrDefaultAsync(pm => pm.UserId == userId && pm.ProjectId == projectId, ct);
+            if (membership != null)
+            {
+                _context.ProjectMemberships.Remove(membership);
+                await SaveChangesAsync(ct);
+            }
         }
 
         private Task<int> SaveChangesAsync(CancellationToken ct = default) =>

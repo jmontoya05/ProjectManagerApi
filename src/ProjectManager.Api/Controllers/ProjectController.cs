@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace ProjectManager.Api.Controllers
 {
     [ApiController]
-    [Route("org/{orgId}/projects")]
+    [Route("org/{orgId:guid}/projects")]
     [Authorize]
     public sealed class ProjectController(
         ICreateProjectUseCase createProjectUseCase,
@@ -38,20 +38,22 @@ namespace ProjectManager.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "ProjectMember")]
         public async Task<IActionResult> List([FromRoute] Guid orgId)
         {
             var response = await _listProjectsUseCase.Execute(orgId);
             return Ok(response);
         }
 
-        [HttpGet("{projectId}")]
+        [HttpGet("{projectId:guid}")]
+        [Authorize(Policy = "ProjectMember")]
         public async Task<IActionResult> GetById([FromRoute] Guid orgId, [FromRoute] Guid projectId)
         {
             var project = await _getProjectByIdUseCase.Execute(projectId);
             return Ok(project);
         }
 
-        [HttpPut("{projectId}")]
+        [HttpPut("{projectId:guid}")]
         public async Task<IActionResult> Update([FromBody] UpdateProjectRequest request, [FromRoute] Guid projectId, [FromRoute] Guid orgId)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

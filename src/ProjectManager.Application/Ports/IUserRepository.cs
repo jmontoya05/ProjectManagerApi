@@ -13,8 +13,11 @@ namespace ProjectManager.Application.Ports
         Task RevokeRefreshTokenAsync(RefreshToken token, CancellationToken ct = default);
         Task<IEnumerable<string>> GetUserRolesByOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
         Task<IEnumerable<Organization>> GetUserOrganizationsAsync(Guid userId, CancellationToken ct = default);
-        Task<bool> UserBelongsToOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
-        Task AddMembershipAsync(OrganizationMembership membership, string roleName, CancellationToken ct = default);
+        Task AddMembershipAsync(OrganizationMembership membership, CancellationToken ct = default);
         Task<Project?> GetProjectByWorkItemIdAsync(Guid workItemId, CancellationToken ct = default);
+        Task<IEnumerable<string>> GetProjectRolesAsync(Guid userId, Guid projectId, CancellationToken ct = default);
+        Task<bool> IsUserMemberOfOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
+        Task<IEnumerable<string>> GetUserPermissionsByOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
+        Task RemoveMembershipAsync(Guid userId, Guid organizationId, CancellationToken ct = default);
     }
 }

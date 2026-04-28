@@ -39,7 +39,7 @@ namespace ProjectManager.Application.UseCases.Organizations.Create
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _userRepository.AddMembershipAsync(membership, "OrgOwner", ct);
+            await _userRepository.AddMembershipAsync(membership, ct);
 
             return organization.Id;
         }

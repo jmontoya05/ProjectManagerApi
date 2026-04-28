@@ -2,20 +2,20 @@
 {
     public class User
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public string PasswordHash { get; set; } = null!;
-        public string DisplayName { get; set; } = null!;
-        public string Status { get; set; } = null!;
-        public DateTime CreatedAt { get; set; }
-        public Guid? CreatedBy { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public Guid? UpdatedBy { get; set; }
-
+        public Guid Id { get; init; }
+        public string Name { get; init; } = null!;
+        public string Email { get; init; } = null!;
+        public string PasswordHash { get; init; } = null!;
+        public string DisplayName { get; init; } = null!;
+        public string Status { get; init; } = null!;
+        public DateTime CreatedAt { get; init; }
+        public Guid? CreatedBy { get; init; }
+        public DateTime UpdatedAt { get; init; }
+        public Guid? UpdatedBy { get; init; }
         //Navigation Properties
-        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
-        public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; set; } = [];
-        public virtual ICollection<TeamMember> TeamMemberships { get; set; } = [];
+        public virtual ICollection<RefreshToken> RefreshTokens { get; init; } = [];
+        public virtual ICollection<OrganizationMembership> OrganizationMemberships { get; init; } = [];
+        public virtual ICollection<TeamMember> TeamMemberships { get; init; } = [];
+        public virtual ICollection<ProjectMembership> ProjectMemberships { get; init; } = [];
     }
 }
