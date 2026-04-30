@@ -10,5 +10,6 @@ namespace ProjectManager.Application.Ports
         Task UpdateAsync(Role role, CancellationToken ct = default);
         Task DeleteAsync(Guid id, CancellationToken ct = default);
         Task<IEnumerable<Role>> GetAllByOrganizationAsync(Guid organizationId, CancellationToken ct = default);
+        Task<Role?> GetByNameAsync(string name, CancellationToken ct = default);
     }
 }

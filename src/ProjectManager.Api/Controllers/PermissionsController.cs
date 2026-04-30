@@ -16,10 +16,10 @@ namespace ProjectManager.Api.Controllers
         public async Task<IActionResult> GetAll(CancellationToken ct)
             => Ok(await permissionService.GetAllAsync(ct));
 
-        [HttpGet("{prmissionId:guid}")]
-        public async Task<IActionResult> GetById([FromRoute] Guid prmissionId, CancellationToken ct)
+        [HttpGet("{permissionId:guid}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid permissionId, CancellationToken ct)
         {
-            var permission = await permissionService.GetByIdAsync(prmissionId, ct);
+            var permission = await permissionService.GetByIdAsync(permissionId, ct);
             return permission == null ? NotFound() : Ok(permission);
         }
 
@@ -30,17 +30,17 @@ namespace ProjectManager.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id }, new { id });
         }
 
-        [HttpPut("{prmissionId:guid}")]
-        public async Task<IActionResult> Update([FromRoute] Guid prmissionId, [FromBody] UpdatePermissionRequest request, CancellationToken ct)
+        [HttpPut("{permissionId:guid}")]
+        public async Task<IActionResult> Update([FromRoute] Guid permissionId, [FromBody] UpdatePermissionRequest request, CancellationToken ct)
         {
-            await permissionService.UpdateAsync(prmissionId, request, ct);
+            await permissionService.UpdateAsync(permissionId, request, ct);
             return NoContent();
         }
 
-        [HttpDelete("{prmissionId:guid}")]
-        public async Task<IActionResult> Delete([FromRoute] Guid prmissionId, CancellationToken ct)
+        [HttpDelete("{permissionId:guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid permissionId, CancellationToken ct)
         {
-            await permissionService.DeleteAsync(prmissionId, ct);
+            await permissionService.DeleteAsync(permissionId, ct);
             return NoContent();
         }
     }

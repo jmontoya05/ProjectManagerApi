@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.Teams;
 using ProjectManager.Application.UseCases.Teams.AddTeamMember;
 using ProjectManager.Application.UseCases.Teams.Create;
 using ProjectManager.Application.UseCases.Teams.Get;
 using ProjectManager.Application.UseCases.Teams.List;
-using System.Security.Claims;
 
 namespace ProjectManager.Api.Controllers
 {
@@ -27,48 +25,33 @@ namespace ProjectManager.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Create([FromBody] CreateTeamRequest request, [FromRoute] Guid orgId)
+        public async Task<IActionResult> Create([FromRoute] Guid orgId, [FromBody] CreateTeamRequest request, CancellationToken ct)
         {
-            var teamId = await _createTeamUseCase.Execute(request, orgId);
-
+            var teamId = await _createTeamUseCase.Execute(request, ct);
             return CreatedAtAction(nameof(Create), new { orgId, id = teamId }, new { id = teamId });
         }
 
         [HttpGet]
         [Authorize(Policy = "OrgMember")]
-        public async Task<IActionResult> List([FromRoute] Guid orgId)
+        public async Task<IActionResult> List([FromRoute] Guid orgId, CancellationToken ct)
         {
-            var teams = await _listTeamsUseCase.Execute();
+            var teams = await _listTeamsUseCase.Execute(ct);
             return Ok(teams);
         }
 
         [HttpGet("{teamId:guid}")]
         [Authorize(Policy = "OrgMember")]
-        public async Task<IActionResult> GetById([FromRoute] Guid teamId)
+        public async Task<IActionResult> GetById([FromRoute] Guid orgId, [FromRoute] Guid teamId, CancellationToken ct)
         {
-            var team = await _getTeamByIdUseCase.Execute(teamId);
+            var team = await _getTeamByIdUseCase.Execute(teamId, ct);
             return Ok(team);
         }
 
         [HttpPost("{teamId:guid}/members")]
         [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> AddMember([FromBody] AddTeamMemberRequest request, [FromRoute] Guid teamId)
+        public async Task<IActionResult> AddMember([FromRoute] Guid orgId, [FromRoute] Guid teamId, [FromBody] AddTeamMemberRequest request, CancellationToken ct)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = ExceptionHandlingMiddleware.GetCorrelationId(HttpContext),
-                        errorCode = "INVALID_TOKEN",
-                        message = "Invalid token."
-                    });
-            }
-
-            await _addTeamMemberUseCase.Execute(request, teamId, userId);
-
+            await _addTeamMemberUseCase.Execute(request, teamId, ct);
             return NoContent();
         }
     }

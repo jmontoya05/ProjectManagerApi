@@ -23,13 +23,13 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
         public async Task<Organization?> GetByIdAsync(Guid organizationId, CancellationToken ct = default) =>
             await _context.Organizations.FirstOrDefaultAsync(o => o.Id == organizationId, ct);
 
-        public async Task<IEnumerable<Organization>> GetAllAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<OrganizationMembership>> GetAllAsync(CancellationToken ct = default)
         {
             var userId = Guid.Parse(_tenantContext.UserId!);
-            return await _context.Organizations
-                .Where(o => o.OrganizationMemberships.Any(om => om.UserId == userId))
-                .Include(o => o.OrganizationMemberships.Where(om => om.UserId == userId))
-                    .ThenInclude(om => om.Role)
+            return await _context.OrganizationMemberships
+                .Where(om => om.UserId == userId)
+                .Include(om => om.Organization)
+                .Include(om => om.Role)
                 .ToListAsync(ct);
         }
 

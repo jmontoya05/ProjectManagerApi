@@ -1,4 +1,5 @@
 using ProjectManager.Application.DTOs.Roles;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 
@@ -46,7 +47,7 @@ namespace ProjectManager.Application.UseCases.Roles
         public async Task UpdateAsync(Guid id, UpdateRoleRequest request, CancellationToken ct = default)
         {
             var role = await _roleRepository.GetByIdAsync(id, ct);
-            if (role == null) throw new InvalidOperationException("Role not found");
+            if (role == null) throw new NotFoundException("Role not found.", "Role", id);
             role.Name = request.Name;
             role.Description = request.Description;
             role.UpdatedAt = DateTime.UtcNow;

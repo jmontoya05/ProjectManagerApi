@@ -6,13 +6,17 @@ using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.Teams.AddTeamMember
 {
-    public sealed class AddTeamMemberUseCase(ITeamMemberRepository teamMemberRepository, ITeamRepository teamRepository, IUserRepository userRepository) : IAddTeamMemberUseCase
+    public sealed class AddTeamMemberUseCase(
+        ITeamMemberRepository teamMemberRepository, 
+        ITeamRepository teamRepository, 
+        IUserRepository userRepository
+    ) : IAddTeamMemberUseCase
     {
         private readonly ITeamMemberRepository _teamMemberRepository = teamMemberRepository;
         private readonly ITeamRepository _teamRepository = teamRepository;
         private readonly IUserRepository _userRepository = userRepository;
 
-        public async Task Execute(AddTeamMemberRequest request, Guid teamId, Guid currentUserId, CancellationToken ct = default)
+        public async Task Execute(AddTeamMemberRequest request, Guid teamId, CancellationToken ct = default)
         {
             _ = await _teamRepository.GetByIdAsync(teamId, ct)
                 ?? throw new NotFoundException("Team not found", "Team", teamId);

@@ -8,7 +8,9 @@ namespace ProjectManager.Api.Controllers
     [ApiController]
     [Route("roles")]
     [Authorize(Policy = "OrgAdmin")]
-    public class RolesController(IRoleService roleService) : ControllerBase
+    public class RolesController(
+        IRoleService roleService
+    ) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> GetAll(CancellationToken ct)

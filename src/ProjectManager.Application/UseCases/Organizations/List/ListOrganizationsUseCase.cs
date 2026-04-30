@@ -11,15 +11,17 @@ namespace ProjectManager.Application.UseCases.Organizations.List
 
         public async Task<IEnumerable<ListOrganizationsResponse>> Execute(CancellationToken ct = default)
         {
-            var organizations = await _organizationRepository.GetAllAsync(ct);
+            var memberships = await _organizationRepository.GetAllAsync(ct);
 
-            return organizations.Select(o => new ListOrganizationsResponse
-            {
-                Id = o.Id,
-                Name = o.Name,
-                Status = o.Status,
-                Roles = o.OrganizationMemberships.Select(om => om.Role.Name)
-            });
+            return memberships
+                .GroupBy(om => om.Organization)
+                .Select(g => new ListOrganizationsResponse
+                {
+                    Id = g.Key.Id,
+                    Name = g.Key.Name,
+                    Status = g.Key.Status,
+                    Roles = g.Select(om => om.Role.Name)
+                });
         }
     }
 }

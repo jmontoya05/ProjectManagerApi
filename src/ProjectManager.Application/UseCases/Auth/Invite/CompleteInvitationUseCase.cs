@@ -1,4 +1,5 @@
 using ProjectManager.Application.DTOs.Auth;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 
@@ -14,13 +15,18 @@ namespace ProjectManager.Application.UseCases.Auth.Invite
 
         public async Task<Guid> Execute(CompleteInvitationRequest request, CancellationToken ct = default)
         {
-            var invitation = await _invitationRepository.GetByTokenAsync(request.InvitationToken, ct);
-            if (invitation == null || invitation.ExpiresAt < DateTime.UtcNow || invitation.Accepted)
-                throw new InvalidOperationException("Invalid or expired invitation.");
+            var invitation = await _invitationRepository.GetByTokenAsync(request.InvitationToken, ct)
+                ?? throw new NotFoundException("Invitation not found.", "Invitation", request.InvitationToken);
+
+            if (invitation.Accepted)
+                throw new BusinessRuleException("This invitation has already been accepted.", "INVITATION_ALREADY_ACCEPTED");
+
+            if (invitation.ExpiresAt < DateTime.UtcNow)
+                throw new BusinessRuleException("This invitation has expired.", "INVITATION_EXPIRED");
 
             var exists = await _userRepository.ExistsByEmailAsync(invitation.Email, ct);
             if (exists)
-                throw new InvalidOperationException("User with this email already exists.");
+                throw new ConflictException("A user with this email already exists.", "User");
 
             var user = new User
             {

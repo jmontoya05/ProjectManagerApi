@@ -4,6 +4,6 @@ namespace ProjectManager.Application.UseCases.Auth.Invite
 {
     public interface IInviteUserUseCase
     {
-        Task<InviteUserResponse> Execute(InviteUserRequest request, Guid adminUserId, CancellationToken ct = default);
+        Task<InviteUserResponse> Execute(InviteUserRequest request, CancellationToken ct = default);
     }
 }

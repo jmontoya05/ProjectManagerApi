@@ -1,19 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectManager.Application.Ports;
+using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
 using ProjectManager.Infrastructure.Persistence.Context;
 
 namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
-    public sealed class WorkItemRepository : IWorkItemRepository
+    public sealed class WorkItemRepository(
+        ProjectManagerDbContext context,
+        ITenantContext tenantContext
+    ) : IWorkItemRepository
     {
-        private readonly ProjectManagerDbContext _context;
-
-        public WorkItemRepository(ProjectManagerDbContext context)
-        {
-            _context = context;
-        }
-
+        private readonly ProjectManagerDbContext _context = context;
+        private readonly ITenantContext _tenantContext = tenantContext;
+        
         public async Task AddAsync(WorkItem workItem, CancellationToken ct = default)
         {
             await _context.WorkItems.AddAsync(workItem, ct);
@@ -28,7 +28,7 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<WorkItem>> GetByProjectAsync(Guid projectId, CancellationToken ct = default) =>
             await _context.WorkItems
-                .Where(wi => wi.ProjectId == projectId)
+                .Where(wi => wi.ProjectId == projectId && wi.Project.OrganizationId.ToString() == _tenantContext.OrganizationId)
                 .Include(wi => wi.Assignee)
                 .Include(wi => wi.Team)
                 .OrderByDescending(wi => wi.UpdatedAt)

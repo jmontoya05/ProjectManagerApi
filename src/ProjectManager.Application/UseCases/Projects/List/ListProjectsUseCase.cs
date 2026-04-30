@@ -7,7 +7,7 @@ namespace ProjectManager.Application.UseCases.Projects.List
     {
         private readonly IProjectRepository _projectRepository = projectRepository;
 
-        public async Task<IEnumerable<ListProjectsResponse>> Execute(Guid organizationId, CancellationToken ct = default)
+        public async Task<IEnumerable<ListProjectsResponse>> Execute(CancellationToken ct = default)
         {
             var projects = await _projectRepository.GetAllAsync(ct);
 

@@ -14,7 +14,7 @@ namespace ProjectManager.Application.UseCases.WorkItems.Update
         private static readonly string[] InProgress = ["Backlog", "Done"];
         private static readonly string[] Done = ["InProgress"];
 
-        public async Task Execute(Guid workItemId, UpdateWorkItemStatusRequest request, Guid currentUserId, CancellationToken ct = default)
+        public async Task Execute(Guid workItemId, UpdateWorkItemStatusRequest request, CancellationToken ct = default)
         {
             var workItem = await _workItemRepository.GetByIdAsync(workItemId, ct)
                 ?? throw new NotFoundException("Work item not found", "WorkItem", workItemId);

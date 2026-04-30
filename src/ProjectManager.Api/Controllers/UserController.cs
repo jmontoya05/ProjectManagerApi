@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.UseCases.Users.GetProfile;
-using System.Security.Claims;
 
 namespace ProjectManager.Api.Controllers
 {
@@ -17,23 +15,9 @@ namespace ProjectManager.Api.Controllers
         
         [HttpGet("me")]
         [Authorize]
-        public async Task<IActionResult> GetMe()
+        public async Task<IActionResult> GetMe(CancellationToken ct)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = ExceptionHandlingMiddleware.GetCorrelationId(HttpContext),
-                        errorCode = "INVALID_TOKEN",
-                        message = "Invalid token."
-                    });
-            }
-
-            var profile = await _getProfileUseCase.Execute(userId);
-
+            var profile = await _getProfileUseCase.Execute(ct);
             return Ok(profile);
         }
     }

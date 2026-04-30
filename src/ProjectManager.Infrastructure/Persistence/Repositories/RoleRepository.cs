@@ -19,6 +19,9 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
                 .Where(r => r.OrganizationId == organizationId || r.OrganizationId == null)
                 .ToListAsync(ct);
 
+        public async Task<Role?> GetByNameAsync(string name, CancellationToken ct = default)
+            => await _context.Roles.FirstOrDefaultAsync(r => r.Name == name, ct);
+
         public async Task<Role?> GetByIdAsync(Guid id, CancellationToken ct = default)
             => await _context.Roles.FirstOrDefaultAsync(r => r.Id == id, ct);
 

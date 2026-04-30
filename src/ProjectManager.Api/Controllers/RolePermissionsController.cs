@@ -7,21 +7,23 @@ namespace ProjectManager.Api.Controllers
     [ApiController]
     [Route("roles/{roleId:guid}/permissions")]
     [Authorize(Policy = "OrgAdmin")]
-    public class RolePermissionsController(IRolePermissionService rolePermissionService) : ControllerBase
+    public class RolePermissionsController(
+        IRolePermissionService rolePermissionService
+    ) : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetPermissions(Guid roleId, CancellationToken ct)
+        public async Task<IActionResult> GetPermissions([FromRoute] Guid roleId, CancellationToken ct)
             => Ok(await rolePermissionService.GetPermissionsByRoleAsync(roleId, ct));
 
         [HttpPost]
-        public async Task<IActionResult> AddPermission(Guid roleId, [FromQuery] Guid permissionId, CancellationToken ct)
+        public async Task<IActionResult> AddPermission([FromRoute] Guid roleId, [FromQuery] Guid permissionId, CancellationToken ct)
         {
             await rolePermissionService.AddPermissionToRoleAsync(roleId, permissionId, ct);
             return NoContent();
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemovePermission(Guid roleId, [FromQuery] Guid permissionId, CancellationToken ct)
+        public async Task<IActionResult> RemovePermission([FromRoute] Guid roleId, [FromQuery] Guid permissionId, CancellationToken ct)
         {
             await rolePermissionService.RemovePermissionFromRoleAsync(roleId, permissionId, ct);
             return NoContent();

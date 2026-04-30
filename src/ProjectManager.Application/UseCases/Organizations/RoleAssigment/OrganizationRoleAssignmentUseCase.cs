@@ -1,14 +1,18 @@
 using ProjectManager.Application.DTOs.Organizations;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
+using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.Organizations.RoleAssigment
 {
     public sealed class OrganizationRoleAssignmentUseCase(
-        IUserRepository userRepository
+        IUserRepository userRepository,
+        ITenantContext tenantContext
     ) : IOrganizationRoleAssignmentUseCase
     {
         private readonly IUserRepository _userRepository = userRepository;
+        private readonly ITenantContext _tenantContext = tenantContext;
 
         public async Task AssignRoleAsync(AssignOrganizationRoleRequest request, CancellationToken ct = default)
         {
@@ -26,6 +30,9 @@ namespace ProjectManager.Application.UseCases.Organizations.RoleAssigment
 
         public async Task RemoveRoleAsync(RemoveOrganizationRoleRequest request, CancellationToken ct = default)
         {
+            var orgId = Guid.TryParse(_tenantContext.OrganizationId, out var id) ? id
+                : throw new UnauthorizedException("Invalid organization context.");
+            request.OrganizationId = orgId;
             await _userRepository.RemoveMembershipAsync(request.UserId, request.OrganizationId, ct);
         }
     }

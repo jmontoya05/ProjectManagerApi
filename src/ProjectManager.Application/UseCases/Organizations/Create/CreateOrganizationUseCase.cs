@@ -1,22 +1,36 @@
 ﻿using ProjectManager.Application.DTOs.Organizations;
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Exceptions;
+using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Application.UseCases.Organizations.Create
 {
-    public sealed class CreateOrganizationUseCase(IOrganizationRepository organizationRepository, IUserRepository userRepository) : ICreateOrganizationUseCase
+    public sealed class CreateOrganizationUseCase(
+        IOrganizationRepository organizationRepository,
+        IUserRepository userRepository,
+        IRoleRepository roleRepository,
+        ITenantContext tenantContext
+    ) : ICreateOrganizationUseCase
     {
         private readonly IOrganizationRepository _organizationRepository = organizationRepository;
         private readonly IUserRepository _userRepository = userRepository;
+        private readonly IRoleRepository _roleRepository = roleRepository;
+        private readonly ITenantContext _tenantContext = tenantContext;
 
-        public async Task<Guid> Execute(CreateOrganizationRequest request, Guid userId, CancellationToken ct = default)
+        public async Task<Guid> Execute(CreateOrganizationRequest request, CancellationToken ct = default)
         {
+            var userId = Guid.TryParse(_tenantContext.UserId, out var id) ? id
+                : throw new UnauthorizedException("Invalid user id context.");
+            
             var user = await _userRepository.GetByIdAsync(userId, ct)
                 ?? throw new NotFoundException("User not found.", "User", userId);
 
             if (user.Status != "Active")
                 throw new BusinessRuleException("User is not active.", "USER_NOT_ACTIVE");
+
+            var ownerRole = await _roleRepository.GetByNameAsync("OrgOwner", ct)
+                ?? throw new NotFoundException("System role 'OrgOwner' not found.", "Role", "OrgOwner");
 
             var organization = new Organization
             {
@@ -31,15 +45,14 @@ namespace ProjectManager.Application.UseCases.Organizations.Create
 
             await _organizationRepository.AddAsync(organization, ct);
 
-            var membership = new OrganizationMembership
+            await _userRepository.AddMembershipAsync(new OrganizationMembership
             {
                 Id = Guid.NewGuid(),
                 OrganizationId = organization.Id,
                 UserId = user.Id,
+                RoleId = ownerRole.Id,
                 CreatedAt = DateTime.UtcNow
-            };
-
-            await _userRepository.AddMembershipAsync(membership, ct);
+            }, ct);
 
             return organization.Id;
         }

@@ -11,7 +11,7 @@ namespace ProjectManager.Application.UseCases.WorkItems.Create
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IProjectRepository _projectRepository = projectRepository;
 
-        public async Task<Guid> Execute(Guid projectId, CreateWorkItemRequest request, Guid currentUserId, CancellationToken ct = default)
+        public async Task<Guid> Execute(Guid projectId, CreateWorkItemRequest request, CancellationToken ct = default)
         {
             var project = await _projectRepository.GetByIdAsync(projectId, ct)
                 ?? throw new NotFoundException("Project not found", "Project", projectId);

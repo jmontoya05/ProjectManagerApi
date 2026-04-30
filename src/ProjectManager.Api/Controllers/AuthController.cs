@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Application.DTOs.Auth;
 using ProjectManager.Application.UseCases.Auth.Invite;
@@ -26,45 +26,45 @@ namespace ProjectManager.Api.Controllers
         private readonly ILogoutUseCase _logoutUseCase = logoutUseCase;
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
         {
-            var response = await _loginUseCase.Execute(request);
+            var response = await _loginUseCase.Execute(request, ct);
             return Ok(response);
         }
 
         [HttpPost("organization")]
-        public async Task<IActionResult> SelectOrganization([FromBody] SelectOrganizationRequest request)
+        public async Task<IActionResult> SelectOrganization([FromBody] SelectOrganizationRequest request, CancellationToken ct)
         {
-            var response = await _selectOrganizationUse.Execute(request);
+            var response = await _selectOrganizationUse.Execute(request, ct);
             return Ok(response);
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest request, CancellationToken ct)
         {
-            var response = await _refreshUseCase.Execute(request);
+            var response = await _refreshUseCase.Execute(request, ct);
             return Ok(response);
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request, CancellationToken ct)
         {
-            await _logoutUseCase.Execute(request);
+            await _logoutUseCase.Execute(request, ct);
             return NoContent();
         }
 
         [HttpPost("invite")]
-        public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request)
+        [Authorize(Policy = "OrgAdmin")]
+        public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request, CancellationToken ct)
         {
-            var adminUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            var response = await inviteUserUseCase.Execute(request, adminUserId);
+            var response = await inviteUserUseCase.Execute(request, ct);
             return Ok(response);
         }
 
         [HttpPost("complete-invitation")]
-        public async Task<IActionResult> CompleteInvitation([FromBody] CompleteInvitationRequest request)
+        public async Task<IActionResult> CompleteInvitation([FromBody] CompleteInvitationRequest request, CancellationToken ct)
         {
-            var userId = await completeInvitationUseCase.Execute(request);
+            var userId = await completeInvitationUseCase.Execute(request, ct);
             return Ok(new { UserId = userId });
         }
     }

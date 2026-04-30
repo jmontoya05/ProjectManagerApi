@@ -1,4 +1,5 @@
 using ProjectManager.Application.DTOs.Auth;
+using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 using System.Security.Cryptography;
@@ -10,18 +11,22 @@ namespace ProjectManager.Application.UseCases.Auth.Invite
     public sealed class InviteUserUseCase(
         IInvitationRepository invitationRepository, 
         IUserRepository userRepository,
+        ITenantContext tenantContext,
         IEmailService emailService
     ) : IInviteUserUseCase
     {
         private readonly IInvitationRepository _invitationRepository = invitationRepository;
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IEmailService _emailService = emailService;
+        private readonly ITenantContext _tenantContext = tenantContext;
 
-        public async Task<InviteUserResponse> Execute(InviteUserRequest request, Guid adminUserId, CancellationToken ct = default)
+        public async Task<InviteUserResponse> Execute(InviteUserRequest request, CancellationToken ct = default)
         {
+            var adminUserId = Guid.TryParse(_tenantContext.UserId, out var id) ? id :
+                throw new UnauthorizedException("Invalid user id context.");
             var exists = await _userRepository.ExistsByEmailAsync(request.Email, ct);
             if (exists)
-                throw new InvalidOperationException("User with this email already exists.");
+                throw new ConflictException("A user with this email already exists.", "User");
             
             var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
             var expiresAt = DateTime.UtcNow.AddDays(3);

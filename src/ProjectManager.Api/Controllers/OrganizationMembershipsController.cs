@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectManager.Application.DTOs.Organizations;
-using ProjectManager.Application.UseCases.Organizations;
 using ProjectManager.Application.UseCases.Organizations.RoleAssigment;
 
 namespace ProjectManager.Api.Controllers
@@ -22,7 +21,6 @@ namespace ProjectManager.Api.Controllers
         [HttpPost("remove-role")]
         public async Task<IActionResult> RemoveRole([FromRoute] Guid orgId, [FromBody] RemoveOrganizationRoleRequest request, CancellationToken ct)
         {
-            request.OrganizationId = orgId;
             await orgRoleUseCase.RemoveRoleAsync(request, ct);
             return NoContent();
         }

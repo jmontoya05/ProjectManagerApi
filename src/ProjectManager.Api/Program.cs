@@ -33,7 +33,6 @@ using ProjectManager.Infrastructure.Persistence.Repositories;
 using ProjectManager.Infrastructure.Services;
 using System.Security.Claims;
 using System.Text;
-using ProjectManager.Application.UseCases.Organizations;
 using ProjectManager.Application.UseCases.Organizations.RoleAssigment;
 using ProjectManager.Application.UseCases.Permissions;
 
@@ -77,7 +76,7 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("OrgAdmin", policy => policy.RequireRole("OrgOwner", "OrgAdmin"))
     .AddPolicy("OrgMember", policy => policy.RequireRole("OrgOwner", "OrgAdmin", "OrgMember"))
     .AddPolicy("ProjectManager", policy => policy.Requirements.Add(new ProjectMemberRequirement("ProjectManager")))
-    .AddPolicy("ProjectMember", policy => policy.Requirements.Add(new ProjectMemberRequirement("ProjectMember")))
+    .AddPolicy("ProjectMember", policy => policy.Requirements.Add(new ProjectMemberRequirement()))
     .AddPolicy("ProjectViewer", policy => policy.Requirements.Add(new ProjectMemberRequirement("ProjectViewer")))
     // Granular work item policies
     .AddPolicy("WorkItem.Create", policy => policy.RequireClaim("Permission", "WorkItem.Create"))

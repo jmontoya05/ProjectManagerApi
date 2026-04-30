@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProjectManager.Api.Middlewares;
 using ProjectManager.Application.DTOs.Organizations;
 using ProjectManager.Application.UseCases.Organizations.Create;
 using ProjectManager.Application.UseCases.Organizations.Get;
 using ProjectManager.Application.UseCases.Organizations.List;
-using System.Security.Claims;
 
 namespace ProjectManager.Api.Controllers
 {
     [ApiController]
     [Route("organizations")]
-    [Authorize(Policy = "OrgAdmin")]
+    [Authorize]
     public sealed class OrganizationController(
         IListOrganizationsUseCase listOrganizationsUseCase, 
         ICreateOrganizationUseCase createOrganizationUseCase, 
@@ -24,37 +22,25 @@ namespace ProjectManager.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = "OrgOwner")]
-        public async Task<IActionResult> Create([FromBody] CreateOrganizationRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateOrganizationRequest request, CancellationToken ct)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized(
-                    new
-                    {
-                        correlationId = ExceptionHandlingMiddleware.GetCorrelationId(HttpContext),
-                        errorCode = "INVALID_TOKEN",
-                        message = "Invalid token."
-                    });
-            }
-
-            var response = await _createOrganizationUseCase.Execute(request, userId);
+            var response = await _createOrganizationUseCase.Execute(request, ct);
             return CreatedAtAction(nameof(Create), new { id = response }, new { id = response });
         }
 
         [HttpGet]
         [Authorize(Policy = "OrgMember")]
-        public async Task<IActionResult> ListByUser()
+        public async Task<IActionResult> ListByUser(CancellationToken ct)
         {
-            var response = await _listOrganizationsUseCase.Execute();
+            var response = await _listOrganizationsUseCase.Execute(ct);
             return Ok(response);
         }
 
-        [HttpGet("{organizationId}")]
+        [HttpGet("{orgId:guid}")]
         [Authorize(Policy = "OrgMember")]
-        public async Task<IActionResult> GetById([FromRoute] Guid organizationId)
+        public async Task<IActionResult> GetById([FromRoute] Guid orgId, CancellationToken ct)
         {
-            var response = await _getOrganizationByIdUseCase.Execute(organizationId);
+            var response = await _getOrganizationByIdUseCase.Execute(orgId, ct);
             return Ok(response);
         }
     }
