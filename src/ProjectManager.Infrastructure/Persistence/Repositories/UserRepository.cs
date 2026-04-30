@@ -73,11 +73,9 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
             return memberships.Select(om => om.Organization).Distinct();
         }
 
-        public async Task<bool> UserBelongsToOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default)
-        {
-            return await _context.OrganizationMemberships.AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
-        }
-
+        public async Task<bool> UserBelongsToOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default) =>
+            await _context.OrganizationMemberships.AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
+        
         public async Task AddMembershipAsync(OrganizationMembership membership, CancellationToken ct = default)
         {
             await _context.OrganizationMemberships.AddAsync(membership, ct);
@@ -114,11 +112,9 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
             return roles;
         }
 
-        public async Task<bool> IsUserMemberOfOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default)
-        {
-            return await _context.OrganizationMemberships.AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
-        }
-
+        public async Task<bool> IsUserMemberOfOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default) =>
+            await _context.OrganizationMemberships.AnyAsync(om => om.UserId == userId && om.OrganizationId == organizationId, ct);
+        
         public async Task<IEnumerable<string>> GetUserPermissionsByOrganizationAsync(Guid userId, Guid organizationId, CancellationToken ct = default)
         {
             var permissions = await _context.OrganizationMemberships

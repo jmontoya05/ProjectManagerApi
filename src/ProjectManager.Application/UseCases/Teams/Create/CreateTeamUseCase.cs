@@ -1,5 +1,4 @@
 ﻿using ProjectManager.Application.DTOs.Teams;
-using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
@@ -16,9 +15,7 @@ namespace ProjectManager.Application.UseCases.Teams.Create
 
         public async Task<Guid> Execute(CreateTeamRequest request, CancellationToken ct = default)
         {
-            var orgId = Guid.TryParse(_tenantContext.OrganizationId, out var id) ? id
-                : throw new UnauthorizedException("Invalid organization context.");
-
+            var orgId = _tenantContext.GetOrganizationIdOrThrow();
             var team = new Team
             {
                 Id = Guid.NewGuid(),

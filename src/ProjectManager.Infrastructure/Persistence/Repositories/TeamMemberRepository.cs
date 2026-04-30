@@ -5,27 +5,22 @@ using ProjectManager.Infrastructure.Persistence.Context;
 
 namespace ProjectManager.Infrastructure.Persistence.Repositories
 {
-    public sealed class TeamMemberRepository : ITeamMemberRepository
+    public sealed class TeamMemberRepository(
+        ProjectManagerDbContext context
+    ) : ITeamMemberRepository
     {
-        private readonly ProjectManagerDbContext _context;
-
-        public TeamMemberRepository(ProjectManagerDbContext context)
-        {
-            _context = context;
-        }
-
+        private readonly ProjectManagerDbContext _context = context;
+        
         public async Task AddMemberAsync(TeamMember member, CancellationToken ct = default)
         {
             await _context.TeamMembers.AddAsync(member, ct);
             await SaveChangesAsync(ct);
         }
 
-        public async Task<bool> IsUserInTeamAsync(Guid userId, Guid teamId, CancellationToken ct = default)
-        {
-            return await _context.TeamMembers
+        public async Task<bool> IsUserInTeamAsync(Guid userId, Guid teamId, CancellationToken ct = default) => 
+            await _context.TeamMembers
                 .AnyAsync(tm => tm.TeamId == teamId && tm.UserId == userId, ct);
-        }
-
+        
         public async Task RemoveMemberAsync(Guid userId, Guid teamId, CancellationToken ct = default)
         {
             var member = await _context.TeamMembers

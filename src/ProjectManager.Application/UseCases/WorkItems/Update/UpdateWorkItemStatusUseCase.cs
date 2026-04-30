@@ -16,9 +16,9 @@ namespace ProjectManager.Application.UseCases.WorkItems.Update
 
         public async Task Execute(Guid workItemId, UpdateWorkItemStatusRequest request, CancellationToken ct = default)
         {
+            var orgId = _tenantContext.GetOrganizationIdOrThrow();
             var workItem = await _workItemRepository.GetByIdAsync(workItemId, ct)
                 ?? throw new NotFoundException("Work item not found", "WorkItem", workItemId);
-            
             var validTransitions = new Dictionary<string, string[]>
             {
                 { "Backlog", Backlog },
@@ -32,12 +32,11 @@ namespace ProjectManager.Application.UseCases.WorkItems.Update
             var project = await _userRepository.GetProjectByWorkItemIdAsync(workItemId, ct)
                 ?? throw new NotFoundException("Project not found for this work item.", "WorkItem", workItemId);
 
-            if (project.OrganizationId.ToString() != _tenantContext.OrganizationId)
+            if (project.OrganizationId != orgId)
                 throw new ForbiddenException("The project doesn't belong to your current organization context.");
 
             workItem.Status = request.Status;
             workItem.UpdatedAt = DateTime.UtcNow;
-
             await _workItemRepository.UpdateAsync(workItem, ct);
         }
     }

@@ -25,7 +25,7 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
             if (!await _context.RolePermissions.AnyAsync(rp => rp.RoleId == roleId && rp.PermissionId == permissionId, ct))
             {
                 _context.RolePermissions.Add(new RolePermission { RoleId = roleId, PermissionId = permissionId });
-                await _context.SaveChangesAsync(ct);
+                await SaveChangesAsync(ct);
             }
         }
 
@@ -35,8 +35,11 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
             if (rp != null)
             {
                 _context.RolePermissions.Remove(rp);
-                await _context.SaveChangesAsync(ct);
+                await SaveChangesAsync(ct);
             }
         }
+        
+        private async Task SaveChangesAsync(CancellationToken ct = default) =>
+            await _context.SaveChangesAsync(ct);
     }
 }

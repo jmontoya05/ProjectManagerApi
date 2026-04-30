@@ -17,6 +17,7 @@ namespace ProjectManager.Application.UseCases.Projects.Update
         {
             var project = await _projectRepository.GetByIdAsync(projectId, ct)
                 ?? throw new NotFoundException("Project not found", "Project", projectId);
+            var currentUserId = _tenantContext.GetUserIdOrThrow();
 
             if (!string.IsNullOrWhiteSpace(request.Name))
                 project.Name = request.Name;
@@ -26,13 +27,9 @@ namespace ProjectManager.Application.UseCases.Projects.Update
                 project.Status = request.Status;
 
             project.UpdatedAt = DateTime.UtcNow;
-            project.UpdatedBy = GetCurrentUserId();
+            project.UpdatedBy = currentUserId;
 
             await _projectRepository.UpdateAsync(project, ct);
         }
-
-        private Guid GetCurrentUserId() =>
-            Guid.TryParse(_tenantContext.UserId, out var id) ? id
-            : throw new UnauthorizedException("Invalid user context.");
     }
 }

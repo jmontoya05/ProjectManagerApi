@@ -15,8 +15,8 @@ namespace ProjectManager.Application.UseCases.Auth.SelectOrganization
 
         public async Task<SelectOrganizationResponse> Execute(SelectOrganizationRequest request, CancellationToken ct = default)
         {
-            var stored = await _userRepository.GetValidRefreshTokenAsync(request.Refreshtoken, ct)
-                ?? throw new NotFoundException("Invalid or expired refresh token", "RefreshToken", request.Refreshtoken);
+            var stored = await _userRepository.GetValidRefreshTokenAsync(request.RefreshToken, ct)
+                ?? throw new NotFoundException("Invalid or expired refresh token", "RefreshToken", request.RefreshToken);
             var userId = stored.UserId;
             var orgId = request.OrganizationId;
             var isMember = await _userRepository.IsUserMemberOfOrganizationAsync(userId, orgId, ct);

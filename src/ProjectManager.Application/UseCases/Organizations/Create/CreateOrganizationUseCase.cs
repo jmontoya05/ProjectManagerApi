@@ -20,9 +20,7 @@ namespace ProjectManager.Application.UseCases.Organizations.Create
 
         public async Task<Guid> Execute(CreateOrganizationRequest request, CancellationToken ct = default)
         {
-            var userId = Guid.TryParse(_tenantContext.UserId, out var id) ? id
-                : throw new UnauthorizedException("Invalid user id context.");
-            
+            var userId = _tenantContext.GetUserIdOrThrow();
             var user = await _userRepository.GetByIdAsync(userId, ct)
                 ?? throw new NotFoundException("User not found.", "User", userId);
 

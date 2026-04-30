@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using ProjectManager.Application.Services;
 using ProjectManager.Application.Ports;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
 
 namespace ProjectManager.Api.Authorization
 {
@@ -18,8 +16,8 @@ namespace ProjectManager.Api.Authorization
         
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectRoleRequirement requirement)
         {
-            var userId = _tenantContext.UserId;
-            var orgId = _tenantContext.OrganizationId;
+            var userId = _tenantContext.TryGetUserId();
+            var orgId = _tenantContext.TryGetOrganizationId();
             if (userId == null || orgId == null)
             {
                 context.Fail();
@@ -35,7 +33,7 @@ namespace ProjectManager.Api.Authorization
                 return;
             }
 
-            var roles = await _userRepository.GetProjectRolesAsync(Guid.Parse(userId), projectId);
+            var roles = await _userRepository.GetProjectRolesAsync(userId.Value, projectId);
             if (roles.Contains(requirement.RequiredRole))
                 context.Succeed(requirement);
             else

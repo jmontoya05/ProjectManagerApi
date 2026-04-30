@@ -28,7 +28,7 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
 
         public async Task<IEnumerable<WorkItem>> GetByProjectAsync(Guid projectId, CancellationToken ct = default) =>
             await _context.WorkItems
-                .Where(wi => wi.ProjectId == projectId && wi.Project.OrganizationId.ToString() == _tenantContext.OrganizationId)
+                .Where(wi => wi.ProjectId == projectId && wi.Project.OrganizationId == _tenantContext.GetOrganizationIdOrThrow())
                 .Include(wi => wi.Assignee)
                 .Include(wi => wi.Team)
                 .OrderByDescending(wi => wi.UpdatedAt)

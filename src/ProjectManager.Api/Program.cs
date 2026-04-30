@@ -90,8 +90,6 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("Team.RemoveMember", policy => policy.RequireClaim("Permission", "Team.RemoveMember"));
 
 //Dependency injection
-builder.Services.AddScoped<ProjectRoleHandler>();
-builder.Services.AddScoped<ProjectMemberHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ProjectRoleHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ProjectMemberHandler>();
 builder.Services.AddScoped<ITokenService, TokenService>();

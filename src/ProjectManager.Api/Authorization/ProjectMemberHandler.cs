@@ -16,8 +16,8 @@ namespace ProjectManager.Api.Authorization
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ProjectMemberRequirement requirement)
         {
-            var userId = _tenantContext.UserId;
-            var orgId = _tenantContext.OrganizationId;
+            var userId = _tenantContext.TryGetUserId();
+            var orgId = _tenantContext.TryGetOrganizationId();
             
             var routeValues = _httpContextAccessor.HttpContext?.Request.RouteValues;
             if (userId == null || orgId == null || 
@@ -29,7 +29,7 @@ namespace ProjectManager.Api.Authorization
                 return;
             }
 
-            var roles = await _userRepository.GetProjectRolesAsync(Guid.Parse(userId), projectId);
+            var roles = await _userRepository.GetProjectRolesAsync(userId.Value, projectId);
             var enumerable = roles as string[] ?? roles.ToArray();
             if (enumerable.Contains(requirement.RequiredRole) || enumerable.Contains("ProjectManager"))
                 context.Succeed(requirement);

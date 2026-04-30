@@ -15,8 +15,7 @@ namespace ProjectManager.Application.UseCases.Users.GetProfile
 
         public async Task<GetProfileResponse> Execute(CancellationToken ct = default)
         {
-            var userId = Guid.TryParse(_tenantContext.UserId, out var id) ? id
-                : throw new UnauthorizedAccessException("User ID not found in tenant context");
+            var userId = _tenantContext.GetUserIdOrThrow();
             var user = await _userRepository.GetByIdAsync(userId, ct)
                 ?? throw new NotFoundException("User not found", "User", userId);
             return new GetProfileResponse

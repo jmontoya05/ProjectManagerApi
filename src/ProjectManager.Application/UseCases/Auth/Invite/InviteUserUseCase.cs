@@ -3,7 +3,6 @@ using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
 using System.Security.Cryptography;
-using System.Text;
 using ProjectManager.Application.Services;
 
 namespace ProjectManager.Application.UseCases.Auth.Invite
@@ -22,8 +21,7 @@ namespace ProjectManager.Application.UseCases.Auth.Invite
 
         public async Task<InviteUserResponse> Execute(InviteUserRequest request, CancellationToken ct = default)
         {
-            var adminUserId = Guid.TryParse(_tenantContext.UserId, out var id) ? id :
-                throw new UnauthorizedException("Invalid user id context.");
+            var adminUserId = _tenantContext.GetUserIdOrThrow();
             var exists = await _userRepository.ExistsByEmailAsync(request.Email, ct);
             if (exists)
                 throw new ConflictException("A user with this email already exists.", "User");

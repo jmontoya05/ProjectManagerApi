@@ -14,21 +14,21 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
         private readonly ProjectManagerDbContext _context = context;
         private readonly ITenantContext _tenantContext = tenantContext;
         
-        public async Task Addasync(Project project, CancellationToken ct = default)
+        public async Task AddAsync(Project project, CancellationToken ct = default)
         {
-            project.OrganizationId = Guid.Parse(_tenantContext.OrganizationId!);
+            project.OrganizationId = _tenantContext.GetOrganizationIdOrThrow();
             await _context.Projects.AddAsync(project, ct);
             await SaveChangesAsync(ct);
         }
 
         public async Task<IEnumerable<Project>> GetAllAsync(CancellationToken ct = default) =>
             await _context.Projects
-                .Where(p => p.OrganizationId.ToString() == _tenantContext.OrganizationId)
+                .Where(p => p.OrganizationId == _tenantContext.GetOrganizationIdOrThrow())
                 .ToListAsync(ct);
 
         public async Task<Project?> GetByIdAsync(Guid projectId, CancellationToken ct = default) =>
             await _context.Projects
-                .FirstOrDefaultAsync(p => p.Id == projectId && p.OrganizationId.ToString() == _tenantContext.OrganizationId, ct);
+                .FirstOrDefaultAsync(p => p.Id == projectId && p.OrganizationId == _tenantContext.GetOrganizationIdOrThrow(), ct);
 
         public async Task UpdateAsync(Project project, CancellationToken ct = default)
         {

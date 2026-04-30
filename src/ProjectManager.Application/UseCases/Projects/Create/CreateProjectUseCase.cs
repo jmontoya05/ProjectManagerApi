@@ -20,8 +20,8 @@ namespace ProjectManager.Application.UseCases.Projects.Create
         {
             _ = await _userRepository.GetByIdAsync(request.OwnerId, ct)
                 ?? throw new NotFoundException("Owner not found", "User", request.OwnerId);
-            var orgId = Guid.Parse(_tenantContext.OrganizationId!);
-            var userId = GetCurrentUserId();
+            var orgId = _tenantContext.GetOrganizationIdOrThrow();
+            var userId = _tenantContext.GetUserIdOrThrow();
             var project = new Project
             {
                 Id = Guid.NewGuid(),
@@ -35,12 +35,8 @@ namespace ProjectManager.Application.UseCases.Projects.Create
                 UpdatedBy = userId
             };
 
-            await _projectRepository.Addasync(project, ct);
+            await _projectRepository.AddAsync(project, ct);
             return project.Id;
         }
-
-        private Guid GetCurrentUserId() =>
-            Guid.TryParse(_tenantContext.UserId, out var id) ? id
-            : throw new UnauthorizedException("Invalid user context.");
     }
 }
