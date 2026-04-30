@@ -18,8 +18,7 @@ namespace ProjectManager.Application.UseCases.Projects
                 Id = Guid.NewGuid(),
                 ProjectId = request.ProjectId,
                 UserId = request.UserId,
-                RoleId = request.RoleId,
-                CreatedAt = DateTime.UtcNow
+                RoleId = request.RoleId
             };
             await _projectRepository.AddMembershipAsync(membership, ct);
         }

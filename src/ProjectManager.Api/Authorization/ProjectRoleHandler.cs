@@ -34,7 +34,8 @@ namespace ProjectManager.Api.Authorization
             }
 
             var roles = await _userRepository.GetProjectRolesAsync(userId.Value, projectId);
-            if (roles.Contains(requirement.RequiredRole))
+            var enumerable = roles.ToList();
+            if (enumerable.Contains(requirement.RequiredRole) || (requirement.AllowEscalation && enumerable.Contains("ProjectManager")))
                 context.Succeed(requirement);
             else
                 context.Fail();

@@ -21,18 +21,14 @@ namespace ProjectManager.Application.UseCases.Projects.Create
             _ = await _userRepository.GetByIdAsync(request.OwnerId, ct)
                 ?? throw new NotFoundException("Owner not found", "User", request.OwnerId);
             var orgId = _tenantContext.GetOrganizationIdOrThrow();
-            var userId = _tenantContext.GetUserIdOrThrow();
+            _ = _tenantContext.GetUserIdOrThrow();
             var project = new Project
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Description = request.Description,
                 OrganizationId = orgId,
-                OwnerId = request.OwnerId,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = userId
+                OwnerId = request.OwnerId
             };
 
             await _projectRepository.AddAsync(project, ct);

@@ -1,27 +1,24 @@
 ﻿namespace ProjectManager.Domain.Entities
 {
-    public class WorkItem
+    public class WorkItem : EntityBase
     {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = null!;
-        public string Description { get; set; } = null!;
-        public string Type { get; set; } = "Task"; // Task, Bug, Story
-        public string Priority { get; set; } = "Medium"; // Low, Medium, High, Critical
+        public string Title { get; init; } = null!;
+        public string Description { get; init; } = null!;
+        public string Type { get; init; } = "Task"; // Task, Bug, Story
+        public string Priority { get; init; } = "Medium"; // Low, Medium, High, Critical
         public string Status { get; set; } = "Backlog"; // Backlog, InProgress, Done
-        public int? StoryPoints { get; set; }
-        public int? TimeEstimateMinutes { get; set; }
-        public Guid ProjectId { get; set; }
-        public Guid? ParentWorkItemId { get; set; }
-        public Guid? AssigneeId { get; set; }
-        public Guid? TeamId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public int? StoryPoints { get; init; }
+        public int? TimeEstimateMinutes { get; init; }
+        public Guid ProjectId { get; init; }
+        public Guid? ParentWorkItemId { get; init; }
+        public Guid? AssigneeId { get; init; }
+        public Guid? TeamId { get; init; }
 
         // Navigation
-        public virtual Project Project { get; set; } = null!;
-        public virtual WorkItem? ParentWorkItem { get; set; }
-        public virtual ICollection<WorkItem> Subtasks { get; set; } = [];
-        public virtual User? Assignee { get; set; }
-        public virtual Team? Team { get; set; }
+        public virtual Project Project { get; init; } = null!;
+        public virtual WorkItem? ParentWorkItem { get; init; }
+        public virtual ICollection<WorkItem> Subtasks { get; init; } = [];
+        public virtual User? Assignee { get; init; }
+        public virtual Team? Team { get; init; }
     }
 }

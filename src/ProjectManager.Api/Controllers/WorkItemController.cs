@@ -8,7 +8,7 @@ using ProjectManager.Application.UseCases.WorkItems.Update;
 namespace ProjectManager.Api.Controllers
 {
     [ApiController]
-    [Route("organizations/{orgId:guid}/projects/{projectId:guid}/workitems")]
+    [Route("projects/{projectId:guid}/workitems")]
     [Authorize(Policy = "ProjectMember")]
     public sealed class WorkItemController(
         IListWorkItemsUseCase listWorkItemsUseCase, 
@@ -21,7 +21,7 @@ namespace ProjectManager.Api.Controllers
         private readonly IUpdateWorkItemStatusUseCase _updateWorkItemStatusUseCase = updateWorkItemStatusUseCase;
 
         [HttpGet]
-        public async Task<IActionResult> List([FromRoute] Guid orgId, [FromRoute] Guid projectId, [FromQuery] WorkItemFilter filter, CancellationToken ct)
+        public async Task<IActionResult> List([FromRoute] Guid projectId, [FromQuery] WorkItemFilter filter, CancellationToken ct)
         {
             var workItems = await _listWorkItemsUseCase.Execute(projectId, filter, ct);
             return Ok(workItems);
@@ -29,15 +29,15 @@ namespace ProjectManager.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = "ProjectManager")]
-        public async Task<IActionResult> Create([FromRoute] Guid orgId, [FromRoute] Guid projectId, [FromBody] CreateWorkItemRequest request, CancellationToken ct)
+        public async Task<IActionResult> Create([FromRoute] Guid projectId, [FromBody] CreateWorkItemRequest request, CancellationToken ct)
         {
             var workItemId = await _createWorkItemUseCase.Execute(projectId, request, ct);
-            return CreatedAtAction(nameof(Create), new { orgId, projectId, id = workItemId }, new { id = workItemId });
+            return CreatedAtAction(nameof(Create), new { projectId, id = workItemId }, new { id = workItemId });
         }
 
         [HttpPatch("{workItemId:guid}/status")]
         [Authorize(Policy = "ProjectManager")]
-        public async Task<IActionResult> UpdateStatus([FromRoute] Guid orgId, [FromRoute] Guid projectId,[FromRoute] Guid workItemId, [FromBody] UpdateWorkItemStatusRequest request, CancellationToken ct)
+        public async Task<IActionResult> UpdateStatus([FromRoute] Guid projectId,[FromRoute] Guid workItemId, [FromBody] UpdateWorkItemStatusRequest request, CancellationToken ct)
         {
             await _updateWorkItemStatusUseCase.Execute(workItemId, request, ct);
             return NoContent();

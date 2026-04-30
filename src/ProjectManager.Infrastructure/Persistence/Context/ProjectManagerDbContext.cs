@@ -1,10 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
 
 namespace ProjectManager.Infrastructure.Persistence.Context
 {
-    public class ProjectManagerDbContext(DbContextOptions<ProjectManagerDbContext> options) : DbContext(options)
+    public class ProjectManagerDbContext(
+        DbContextOptions<ProjectManagerDbContext> options,
+        ITenantContext tenantContext
+    ) : DbContext(options)
     {
+        private readonly ITenantContext _tenantContext = tenantContext;
+
         private static readonly DateTime SeedDate = new(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         public DbSet<User> Users => Set<User>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
@@ -19,6 +25,32 @@ namespace ProjectManager.Infrastructure.Persistence.Context
         public DbSet<ProjectMembership> ProjectMemberships => Set<ProjectMembership>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<Invitation> Invitations => Set<Invitation>();
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entries = ChangeTracker.Entries<EntityBase>();
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                    entry.Entity.CreatedBy = _tenantContext.GetUserIdOrThrow();
+                    entry.Entity.UpdatedBy = _tenantContext.GetUserIdOrThrow();
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                    entry.Entity.UpdatedBy = _tenantContext.GetUserIdOrThrow();
+                }
+                else if (entry.State == EntityState.Deleted)
+                {
+                    entry.Entity.DeletedAt = DateTime.UtcNow;
+                    entry.Entity.DeletedBy = _tenantContext.GetUserIdOrThrow();
+                }
+            }
+            return base.SaveChangesAsync(cancellationToken);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -221,6 +253,33 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                       .IsRequired(false)
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
+            modelBuilder.Entity<Project>().HasQueryFilter(p => p.DeletedAt == null);
+            modelBuilder.Entity<Project>().HasQueryFilter(p => p.DeletedBy == null);
+            modelBuilder.Entity<WorkItem>().HasQueryFilter(wi => wi.DeletedAt == null);
+            modelBuilder.Entity<WorkItem>().HasQueryFilter(wi => wi.DeletedBy == null);
+            modelBuilder.Entity<Team>().HasQueryFilter(t => t.DeletedAt == null);
+            modelBuilder.Entity<Team>().HasQueryFilter(t => t.DeletedBy == null);
+            modelBuilder.Entity<OrganizationMembership>().HasQueryFilter(om => om.DeletedAt == null);
+            modelBuilder.Entity<OrganizationMembership>().HasQueryFilter(om => om.DeletedBy == null);
+            modelBuilder.Entity<User>().HasQueryFilter(u => u.DeletedAt == null);
+            modelBuilder.Entity<User>().HasQueryFilter(u => u.DeletedBy == null);
+            modelBuilder.Entity<Organization>().HasQueryFilter(o => o.DeletedAt == null);
+            modelBuilder.Entity<Organization>().HasQueryFilter(o => o.DeletedBy == null);
+            modelBuilder.Entity<Role>().HasQueryFilter(r => r.DeletedAt == null);
+            modelBuilder.Entity<Role>().HasQueryFilter(r => r.DeletedBy == null);
+            modelBuilder.Entity<Permission>().HasQueryFilter(p => p.DeletedAt == null);
+            modelBuilder.Entity<Permission>().HasQueryFilter(p => p.DeletedBy == null);
+            modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedAt == null);
+            modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedBy == null);
+            modelBuilder.Entity<Invitation>().HasQueryFilter(i => i.DeletedAt == null);
+            modelBuilder.Entity<Invitation>().HasQueryFilter(i => i.DeletedBy == null);
+            modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedAt == null);
+            modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedBy == null);
+            modelBuilder.Entity<TeamMember>().HasQueryFilter(tm => tm.DeletedAt == null);
+            modelBuilder.Entity<TeamMember>().HasQueryFilter(tm => tm.DeletedBy == null);
+            modelBuilder.Entity<ProjectMembership>().HasQueryFilter(pm => pm.DeletedAt == null);
+            modelBuilder.Entity<ProjectMembership>().HasQueryFilter(pm => pm.DeletedBy == null);
         }
     }
 }

@@ -10,36 +10,16 @@ namespace ProjectManager.Application.UseCases.WorkItems.List
 
         public async Task<PagedResponse<WorkItemResponse>> Execute(Guid projectId, WorkItemFilter filter, CancellationToken ct = default)
         {
-            var query = await _workItemRepository.GetByProjectAsync(projectId, ct);
+            var (items, hasNextPage) = await _workItemRepository.GetPagedByProjectAsync(projectId, filter, ct);
 
-            if (!string.IsNullOrWhiteSpace(filter.Status))
-                query = query.Where(wi => wi.Status == filter.Status);
-
-            if (filter.AssigneeId.HasValue)
-                query = query.Where(w => w.AssigneeId == filter.AssigneeId);
-
-            if (filter.TeamId.HasValue)
-                query = query.Where(w => w.TeamId == filter.TeamId);
-
-            if (!string.IsNullOrWhiteSpace(filter.Cursor))
-            {
-                var cursorDateTime = DateTime.Parse(filter.Cursor, System.Globalization.CultureInfo.InvariantCulture);
-                query = query.Where(w => w.UpdatedAt < cursorDateTime);
-            }
-
-            var items = query
-                .Take(filter.PageSize + 1)
-                .ToList();
-
-            var hasNextPage = items.Count > filter.PageSize;
             string? nextCursor = null;
-            if (hasNextPage)
+            var workItems = items.ToList();
+            if (hasNextPage && workItems.Count != 0)
             {
-                items.RemoveAt(items.Count - 1);
-                nextCursor = items.Last().UpdatedAt.ToString("o");
+                nextCursor = workItems.Last().UpdatedAt.ToString("o");
             }
 
-            var workItemDtos = items.Select(w => new WorkItemResponse
+            var workItemsDto = workItems.Select(w => new WorkItemResponse
             {
                 Id = w.Id,
                 Title = w.Title,
@@ -57,12 +37,13 @@ namespace ProjectManager.Application.UseCases.WorkItems.List
                 TeamName = w.Team?.Name,
                 CreatedAt = w.CreatedAt,
                 UpdatedAt = w.UpdatedAt,
-                Cursor = w.UpdatedAt.ToString("o")
+                Cursor = w.UpdatedAt.ToString("o"),
+                SubtaskCount = w.Subtasks.Count
             });
 
             return new PagedResponse<WorkItemResponse>
             {
-                Items = workItemDtos.ToList(),
+                Items = workItemsDto.ToList(),
                 NextCursor = nextCursor
             };
         }

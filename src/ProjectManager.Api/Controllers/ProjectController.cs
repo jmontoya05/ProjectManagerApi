@@ -9,7 +9,7 @@ using ProjectManager.Application.UseCases.Projects.Update;
 namespace ProjectManager.Api.Controllers
 {
     [ApiController]
-    [Route("org/{orgId:guid}/projects")]
+    [Route("projects")]
     [Authorize]
     public sealed class ProjectController(
         ICreateProjectUseCase createProjectUseCase,
@@ -24,7 +24,7 @@ namespace ProjectManager.Api.Controllers
         private readonly IUpdateProjectUseCase _updateProjectUseCase = updateProjectUseCase;
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromRoute] Guid orgId, [FromBody] CreateProjectRequest request, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] CreateProjectRequest request, CancellationToken ct)
         {
             var projectId = await _createProjectUseCase.Execute(request, ct);
             return CreatedAtAction(nameof(Create), new { id = projectId }, new { id = projectId });
@@ -32,7 +32,7 @@ namespace ProjectManager.Api.Controllers
 
         [HttpGet]
         [Authorize(Policy = "ProjectMember")]
-        public async Task<IActionResult> List([FromRoute] Guid orgId, CancellationToken ct)
+        public async Task<IActionResult> List(CancellationToken ct)
         {
             var response = await _listProjectsUseCase.Execute(ct);
             return Ok(response);
@@ -40,14 +40,14 @@ namespace ProjectManager.Api.Controllers
 
         [HttpGet("{projectId:guid}")]
         [Authorize(Policy = "ProjectMember")]
-        public async Task<IActionResult> GetById([FromRoute] Guid orgId, [FromRoute] Guid projectId, CancellationToken ct)
+        public async Task<IActionResult> GetById([FromRoute] Guid projectId, CancellationToken ct)
         {
             var project = await _getProjectByIdUseCase.Execute(projectId, ct);
             return Ok(project);
         }
 
         [HttpPut("{projectId:guid}")]
-        public async Task<IActionResult> Update([FromRoute] Guid orgId, [FromRoute] Guid projectId, [FromBody] UpdateProjectRequest request, CancellationToken ct)
+        public async Task<IActionResult> Update([FromRoute] Guid projectId, [FromBody] UpdateProjectRequest request, CancellationToken ct)
         {
             await _updateProjectUseCase.Execute(request, projectId, ct);
             return NoContent();

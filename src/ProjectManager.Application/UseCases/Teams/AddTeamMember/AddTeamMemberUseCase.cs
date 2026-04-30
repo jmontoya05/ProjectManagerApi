@@ -33,8 +33,7 @@ namespace ProjectManager.Application.UseCases.Teams.AddTeamMember
             {
                 Id = Guid.NewGuid(),
                 TeamId = teamId,
-                UserId = request.UserId,
-                JoinedAt = DateTime.UtcNow
+                UserId = request.UserId
             };
 
             await _teamMemberRepository.AddMemberAsync(member, ct);

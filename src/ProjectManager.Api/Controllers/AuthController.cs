@@ -24,6 +24,8 @@ namespace ProjectManager.Api.Controllers
         private readonly ISelectOrganizationUseCase _selectOrganizationUse = selectOrganizationUseCase;
         private readonly IRefreshUseCase _refreshUseCase = refreshUseCase;
         private readonly ILogoutUseCase _logoutUseCase = logoutUseCase;
+        private readonly IInviteUserUseCase _inviteUserUseCase = inviteUserUseCase;
+        private readonly ICompleteInvitationUseCase _completeInvitationUseCase = completeInvitationUseCase;
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
@@ -57,14 +59,14 @@ namespace ProjectManager.Api.Controllers
         [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request, CancellationToken ct)
         {
-            var response = await inviteUserUseCase.Execute(request, ct);
+            var response = await _inviteUserUseCase.Execute(request, ct);
             return Ok(response);
         }
 
         [HttpPost("complete-invitation")]
         public async Task<IActionResult> CompleteInvitation([FromBody] CompleteInvitationRequest request, CancellationToken ct)
         {
-            var userId = await completeInvitationUseCase.Execute(request, ct);
+            var userId = await _completeInvitationUseCase.Execute(request, ct);
             return Ok(new { UserId = userId });
         }
     }

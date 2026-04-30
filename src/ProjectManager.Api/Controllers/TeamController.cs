@@ -9,7 +9,7 @@ using ProjectManager.Application.UseCases.Teams.List;
 namespace ProjectManager.Api.Controllers
 {
     [ApiController]
-    [Route("org/{orgId:guid}/teams")]
+    [Route("teams")]
     [Authorize]
     public sealed class TeamController(
         ICreateTeamUseCase createTeamUseCase, 
@@ -25,15 +25,15 @@ namespace ProjectManager.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Create([FromRoute] Guid orgId, [FromBody] CreateTeamRequest request, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] CreateTeamRequest request, CancellationToken ct)
         {
             var teamId = await _createTeamUseCase.Execute(request, ct);
-            return CreatedAtAction(nameof(Create), new { orgId, id = teamId }, new { id = teamId });
+            return CreatedAtAction(nameof(Create), new { id = teamId }, new { id = teamId });
         }
 
         [HttpGet]
         [Authorize(Policy = "OrgMember")]
-        public async Task<IActionResult> List([FromRoute] Guid orgId, CancellationToken ct)
+        public async Task<IActionResult> List(CancellationToken ct)
         {
             var teams = await _listTeamsUseCase.Execute(ct);
             return Ok(teams);
@@ -41,7 +41,7 @@ namespace ProjectManager.Api.Controllers
 
         [HttpGet("{teamId:guid}")]
         [Authorize(Policy = "OrgMember")]
-        public async Task<IActionResult> GetById([FromRoute] Guid orgId, [FromRoute] Guid teamId, CancellationToken ct)
+        public async Task<IActionResult> GetById([FromRoute] Guid teamId, CancellationToken ct)
         {
             var team = await _getTeamByIdUseCase.Execute(teamId, ct);
             return Ok(team);
@@ -49,7 +49,7 @@ namespace ProjectManager.Api.Controllers
 
         [HttpPost("{teamId:guid}/members")]
         [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> AddMember([FromRoute] Guid orgId, [FromRoute] Guid teamId, [FromBody] AddTeamMemberRequest request, CancellationToken ct)
+        public async Task<IActionResult> AddMember([FromRoute] Guid teamId, [FromBody] AddTeamMemberRequest request, CancellationToken ct)
         {
             await _addTeamMemberUseCase.Execute(request, teamId, ct);
             return NoContent();

@@ -1,15 +1,13 @@
 ﻿namespace ProjectManager.Domain.Entities
 {
-    public class RefreshToken
+    public class RefreshToken : EntityBase
     {
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-        public string Token { get; set; } = null!;
-        public DateTime ExpiresAt { get; set; }
+        public Guid UserId { get; init; }
+        public string Token { get; init; } = null!;
+        public DateTime ExpiresAt { get; init; }
         public DateTime? RevokedAt { get; set; }
-        public DateTime CreatedAt { get; set; }
 
         //Navigation properties
-        public virtual User User { get; set; } = null!;
+        public virtual User User { get; init; } = null!;
     }
 }

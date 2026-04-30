@@ -19,6 +19,7 @@ using ProjectManager.Application.UseCases.Projects.Create;
 using ProjectManager.Application.UseCases.Projects.Get;
 using ProjectManager.Application.UseCases.Projects.List;
 using ProjectManager.Application.UseCases.Projects.Update;
+using ProjectManager.Application.UseCases.Projects;
 using ProjectManager.Application.UseCases.Roles;
 using ProjectManager.Application.UseCases.Teams.AddTeamMember;
 using ProjectManager.Application.UseCases.Teams.Create;
@@ -39,7 +40,10 @@ using ProjectManager.Application.UseCases.Permissions;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ProjectManagerDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ProjectManagerDbContext>((_, options) =>
+{
+    options.UseSqlServer(connectionString);
+}, contextLifetime: ServiceLifetime.Scoped, optionsLifetime: ServiceLifetime.Scoped);
 
 builder.Services.AddControllers(options =>
 {
@@ -75,9 +79,9 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("OrgOwner", policy => policy.RequireRole("OrgOwner"))
     .AddPolicy("OrgAdmin", policy => policy.RequireRole("OrgOwner", "OrgAdmin"))
     .AddPolicy("OrgMember", policy => policy.RequireRole("OrgOwner", "OrgAdmin", "OrgMember"))
-    .AddPolicy("ProjectManager", policy => policy.Requirements.Add(new ProjectMemberRequirement("ProjectManager")))
-    .AddPolicy("ProjectMember", policy => policy.Requirements.Add(new ProjectMemberRequirement()))
-    .AddPolicy("ProjectViewer", policy => policy.Requirements.Add(new ProjectMemberRequirement("ProjectViewer")))
+    .AddPolicy("ProjectManager", policy => policy.Requirements.Add(new ProjectRoleRequirement("ProjectManager")))
+    .AddPolicy("ProjectMember", policy => policy.Requirements.Add(new ProjectRoleRequirement("ProjectMember", true)))
+    .AddPolicy("ProjectViewer", policy => policy.Requirements.Add(new ProjectRoleRequirement("ProjectViewer", true)))
     // Granular work item policies
     .AddPolicy("WorkItem.Create", policy => policy.RequireClaim("Permission", "WorkItem.Create"))
     .AddPolicy("WorkItem.Edit", policy => policy.RequireClaim("Permission", "WorkItem.Edit"))
@@ -91,7 +95,6 @@ builder.Services.AddAuthorizationBuilder()
 
 //Dependency injection
 builder.Services.AddScoped<IAuthorizationHandler, ProjectRoleHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, ProjectMemberHandler>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ILoginUseCase, LoginUseCase>();
 builder.Services.AddScoped<ISelectOrganizationUseCase, SelectOrganizationUseCase>();
@@ -131,6 +134,7 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
 builder.Services.AddScoped<IOrganizationRoleAssignmentUseCase, OrganizationRoleAssignmentUseCase>();
+builder.Services.AddScoped<IProjectRoleAssignmentService, ProjectRoleAssignmentService>();
 
 var app = builder.Build();
 

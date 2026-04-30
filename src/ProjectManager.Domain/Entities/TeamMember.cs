@@ -1,14 +1,12 @@
 ﻿namespace ProjectManager.Domain.Entities
 {
-    public class TeamMember
+    public class TeamMember : EntityBase
     {
-        public Guid Id { get; set; }
-        public Guid TeamId { get; set; }
-        public Guid UserId { get; set; }
-        public DateTime JoinedAt { get; set; }
+        public Guid TeamId { get; init; }
+        public Guid UserId { get; init; }
 
         //Navigation Properties
-        public virtual Team Team { get; set; } = null!;
-        public virtual User User { get; set; } = null!;
+        public virtual Team Team { get; init; } = null!;
+        public virtual User User { get; init; } = null!;
     }
 }
