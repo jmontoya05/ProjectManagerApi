@@ -2,10 +2,15 @@
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Exceptions;
 using ProjectManager.Domain.Entities;
+using ProjectManager.Domain.Enums;
 
 namespace ProjectManager.Application.UseCases.WorkItems.Create
 {
-    public sealed class CreateWorkItemUseCase(IWorkItemRepository workItemRepository, IUserRepository userRepository, IProjectRepository projectRepository) : ICreateWorkItemUseCase
+    public sealed class CreateWorkItemUseCase(
+        IWorkItemRepository workItemRepository, 
+        IUserRepository userRepository, 
+        IProjectRepository projectRepository
+    ) : ICreateWorkItemUseCase
     {
         private readonly IWorkItemRepository _workItemRepository = workItemRepository;
         private readonly IUserRepository _userRepository = userRepository;
@@ -13,7 +18,7 @@ namespace ProjectManager.Application.UseCases.WorkItems.Create
 
         public async Task<Guid> Execute(Guid projectId, CreateWorkItemRequest request, CancellationToken ct = default)
         {
-            var project = await _projectRepository.GetByIdAsync(projectId, ct)
+            _ = await _projectRepository.GetByIdAsync(projectId, ct)
                 ?? throw new NotFoundException("Project not found", "Project", projectId);
 
             if (request.ParentWorkItemId.HasValue)
@@ -36,9 +41,9 @@ namespace ProjectManager.Application.UseCases.WorkItems.Create
                 Id = Guid.NewGuid(),
                 Title = request.Title,
                 Description = request.Description,
-                Type = request.Type,
-                Priority = request.Priority,
-                Status = "Backlog",
+                Type = Enum.Parse<WorkItemType>(request.Type),
+                Priority = Enum.Parse<WorkItemPriority>(request.Priority),
+                Status = WorkItemStatus.Backlog,
                 StoryPoints = request.StoryPoints,
                 TimeEstimateMinutes = request.TimeEstimateMinutes,
                 ProjectId = projectId,

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
+using ProjectManager.Domain.Enums;
 
 namespace ProjectManager.Infrastructure.Persistence.Context
 {
@@ -35,8 +36,8 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                 {
                     entry.Entity.CreatedAt = DateTime.UtcNow;
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.CreatedBy = _tenantContext.GetUserIdOrThrow();
-                    entry.Entity.UpdatedBy = _tenantContext.GetUserIdOrThrow();
+                    entry.Entity.CreatedBy = _tenantContext.TryGetUserId();
+                    entry.Entity.UpdatedBy = _tenantContext.TryGetUserId();
                 }
                 else if (entry.State == EntityState.Modified)
                 {
@@ -149,7 +150,7 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                         Email = "admin@demo.com",
                         DisplayName = "Demo Admin",
                         PasswordHash = "$2y$10$stjSoctlKDZo1KlIa1znEuypAG/zsmFZ/YpPLCopo61te0SVMxCeu",
-                        Status = "Active",
+                        Status = UserStatus.Active,
                         CreatedAt = SeedDate,
                         UpdatedAt = SeedDate
                     }
@@ -160,7 +161,7 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                 {
                     Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                     Name = "Demo Organization",
-                    Status = "Active",
+                    Status = OrganizationStatus.Active,
                     OwnerId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
                     CreatedAt = SeedDate,
                     UpdatedAt = SeedDate
@@ -214,26 +215,26 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<WorkItem>(entity =>
-            {
-                entity.HasKey(wi => wi.Id);
-                entity.HasOne(wi => wi.Project)
-                      .WithMany()
-                      .HasForeignKey(wi => wi.ProjectId)
-                      .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(wi => wi.ParentWorkItem)
-                      .WithMany(wi => wi.Subtasks)
-                      .HasForeignKey(wi => wi.ParentWorkItemId)
-                      .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(wi => wi.Assignee)
-                      .WithMany()
-                      .HasForeignKey(wi => wi.AssigneeId)
-                      .OnDelete(DeleteBehavior.SetNull);
-                entity.HasOne(wi => wi.Team)
-                      .WithMany()
-                      .HasForeignKey(wi => wi.TeamId)
-                      .OnDelete(DeleteBehavior.SetNull);
-            });
+             modelBuilder.Entity<WorkItem>(entity =>
+             {
+                 entity.HasKey(wi => wi.Id);
+                 entity.HasOne(wi => wi.Project)
+                       .WithMany(p => p.WorkItems)
+                       .HasForeignKey(wi => wi.ProjectId)
+                       .OnDelete(DeleteBehavior.Cascade);
+                 entity.HasOne(wi => wi.ParentWorkItem)
+                       .WithMany(wi => wi.Subtasks)
+                       .HasForeignKey(wi => wi.ParentWorkItemId)
+                       .OnDelete(DeleteBehavior.Restrict);
+                 entity.HasOne(wi => wi.Assignee)
+                       .WithMany()
+                       .HasForeignKey(wi => wi.AssigneeId)
+                       .OnDelete(DeleteBehavior.SetNull);
+                 entity.HasOne(wi => wi.Team)
+                       .WithMany()
+                       .HasForeignKey(wi => wi.TeamId)
+                       .OnDelete(DeleteBehavior.SetNull);
+             });
 
             modelBuilder.Entity<RefreshToken>(entity =>
             {
@@ -255,31 +256,39 @@ namespace ProjectManager.Infrastructure.Persistence.Context
             });
 
             modelBuilder.Entity<Project>().HasQueryFilter(p => p.DeletedAt == null);
-            modelBuilder.Entity<Project>().HasQueryFilter(p => p.DeletedBy == null);
             modelBuilder.Entity<WorkItem>().HasQueryFilter(wi => wi.DeletedAt == null);
-            modelBuilder.Entity<WorkItem>().HasQueryFilter(wi => wi.DeletedBy == null);
             modelBuilder.Entity<Team>().HasQueryFilter(t => t.DeletedAt == null);
-            modelBuilder.Entity<Team>().HasQueryFilter(t => t.DeletedBy == null);
             modelBuilder.Entity<OrganizationMembership>().HasQueryFilter(om => om.DeletedAt == null);
-            modelBuilder.Entity<OrganizationMembership>().HasQueryFilter(om => om.DeletedBy == null);
             modelBuilder.Entity<User>().HasQueryFilter(u => u.DeletedAt == null);
-            modelBuilder.Entity<User>().HasQueryFilter(u => u.DeletedBy == null);
             modelBuilder.Entity<Organization>().HasQueryFilter(o => o.DeletedAt == null);
-            modelBuilder.Entity<Organization>().HasQueryFilter(o => o.DeletedBy == null);
             modelBuilder.Entity<Role>().HasQueryFilter(r => r.DeletedAt == null);
-            modelBuilder.Entity<Role>().HasQueryFilter(r => r.DeletedBy == null);
             modelBuilder.Entity<Permission>().HasQueryFilter(p => p.DeletedAt == null);
-            modelBuilder.Entity<Permission>().HasQueryFilter(p => p.DeletedBy == null);
             modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedAt == null);
-            modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedBy == null);
             modelBuilder.Entity<Invitation>().HasQueryFilter(i => i.DeletedAt == null);
-            modelBuilder.Entity<Invitation>().HasQueryFilter(i => i.DeletedBy == null);
-            modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedAt == null);
-            modelBuilder.Entity<RefreshToken>().HasQueryFilter(rt => rt.DeletedBy == null);
             modelBuilder.Entity<TeamMember>().HasQueryFilter(tm => tm.DeletedAt == null);
-            modelBuilder.Entity<TeamMember>().HasQueryFilter(tm => tm.DeletedBy == null);
             modelBuilder.Entity<ProjectMembership>().HasQueryFilter(pm => pm.DeletedAt == null);
-            modelBuilder.Entity<ProjectMembership>().HasQueryFilter(pm => pm.DeletedBy == null);
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.Status).HasConversion<string>();
+            });
+
+            modelBuilder.Entity<Organization>(entity =>
+            {
+                entity.Property(o => o.Status).HasConversion<string>();
+            });
+
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.Property(p => p.Status).HasConversion<string>();
+            });
+
+            modelBuilder.Entity<WorkItem>(entity =>
+            {
+                entity.Property(wi => wi.Type).HasConversion<string>();
+                entity.Property(wi => wi.Priority).HasConversion<string>();
+                entity.Property(wi => wi.Status).HasConversion<string>();
+            });
         }
     }
 }

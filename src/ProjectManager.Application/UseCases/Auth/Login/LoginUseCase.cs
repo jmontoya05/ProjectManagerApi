@@ -5,7 +5,10 @@ using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Auth.Login
 {
-    public class LoginUseCase(IUserRepository userRepository, ITokenService tokenService) : ILoginUseCase
+    public class LoginUseCase(
+        IUserRepository userRepository, 
+        ITokenService tokenService
+    ) : ILoginUseCase
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly ITokenService _tokenService = tokenService;
@@ -17,8 +20,8 @@ namespace ProjectManager.Application.UseCases.Auth.Login
 
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 throw new BusinessRuleException("Invalid password", "INVALID_PASSWORD");
-
-            if (user.Status != "Active")
+            
+            if (!user.IsActive)
                 throw new BusinessRuleException("User is blocked", "USER_BLOCKED");
 
             var organizations = await _userRepository.GetUserOrganizationsAsync(user.Id, ct);
@@ -36,7 +39,7 @@ namespace ProjectManager.Application.UseCases.Auth.Login
                     Id = user.Id,
                     Email = user.Email,
                     DisplayName = user.DisplayName,
-                    Status = user.Status
+                    Status = user.Status.ToString()
                 },
                 Organizations = organizationsDto,
                 RefreshToken = refreshToken

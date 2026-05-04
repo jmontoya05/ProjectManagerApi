@@ -36,7 +36,7 @@ namespace ProjectManager.Infrastructure.Persistence.Repositories
                 .Where(wi => wi.ProjectId == projectId && wi.Project.OrganizationId == _tenantContext.GetOrganizationIdOrThrow());
 
             if (!string.IsNullOrWhiteSpace(filter.Status))
-                query = query.Where(wi => wi.Status == filter.Status);
+                query = query.Where(wi => wi.Status.ToString() == filter.Status);
 
             if (filter.AssigneeId.HasValue)
                 query = query.Where(wi => wi.AssigneeId == filter.AssigneeId);

@@ -2,6 +2,8 @@
 using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Services;
+using ProjectManager.Domain.Enums;
+using ProjectManager.Domain.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Projects.Update
 {
@@ -21,12 +23,23 @@ namespace ProjectManager.Application.UseCases.Projects.Update
 
             if (!string.IsNullOrWhiteSpace(request.Name))
                 project.Name = request.Name;
+            
             if (!string.IsNullOrWhiteSpace(request.Description))
                 project.Description = request.Description;
+            
             if (!string.IsNullOrWhiteSpace(request.Status))
-                project.Status = request.Status;
+            {
+                try
+                {
+                    var newStatus = Enum.Parse<ProjectStatus>(request.Status);
+                    project.TransitionStatus(newStatus);
+                }
+                catch (InvalidProjectStatusTransitionException ex)
+                {
+                    throw new BusinessRuleException(ex.Message, ex.ErrorCode);
+                }
+            }
 
-            project.UpdatedAt = DateTime.UtcNow;
             project.UpdatedBy = currentUserId;
 
             await _projectRepository.UpdateAsync(project, ct);

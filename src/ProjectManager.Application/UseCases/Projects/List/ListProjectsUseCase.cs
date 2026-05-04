@@ -3,7 +3,9 @@ using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.Projects.List
 {
-    public sealed class ListProjectsUseCase(IProjectRepository projectRepository) : IListProjectsUseCase
+    public sealed class ListProjectsUseCase(
+        IProjectRepository projectRepository
+    ) : IListProjectsUseCase
     {
         private readonly IProjectRepository _projectRepository = projectRepository;
 
@@ -17,7 +19,7 @@ namespace ProjectManager.Application.UseCases.Projects.List
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    Status = p.Status,
+                    Status = p.Status.ToString(),
                     OrganizationId = p.OrganizationId,
                     OwnerId = p.OwnerId,
                     CreatedAt = p.CreatedAt,

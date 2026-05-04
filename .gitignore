@@ -7,8 +7,6 @@
 .env
 
 # Implementation planning documents (local tracking only)
-docs/
-RefactorPlan.md
 .claude
 
 # User-specific files

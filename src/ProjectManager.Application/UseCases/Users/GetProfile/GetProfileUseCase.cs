@@ -23,7 +23,7 @@ namespace ProjectManager.Application.UseCases.Users.GetProfile
                 Id = user.Id,
                 Email = user.Email,
                 DisplayName = user.DisplayName,
-                Status = user.Status
+                Status = user.Status.ToString()
             };
         }
     }

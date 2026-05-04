@@ -19,7 +19,7 @@ namespace ProjectManager.Application.UseCases.Organizations.List
                 {
                     Id = g.Key.Id,
                     Name = g.Key.Name,
-                    Status = g.Key.Status,
+                    Status = g.Key.Status.ToString(),
                     Roles = g.Select(om => om.Role.Name)
                 });
         }

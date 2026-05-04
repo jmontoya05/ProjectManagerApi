@@ -2,6 +2,8 @@
 using ProjectManager.Application.Ports;
 using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Services;
+using ProjectManager.Domain.Enums;
+using ProjectManager.Domain.Exceptions;
 
 namespace ProjectManager.Application.UseCases.WorkItems.Update
 {
@@ -10,24 +12,12 @@ namespace ProjectManager.Application.UseCases.WorkItems.Update
         private readonly IWorkItemRepository _workItemRepository = workItemRepository;
         private readonly IUserRepository _userRepository = userRepository;
         private readonly ITenantContext _tenantContext = tenantContext;
-        private static readonly string[] Backlog = ["InProgress"];
-        private static readonly string[] InProgress = ["Backlog", "Done"];
-        private static readonly string[] Done = ["InProgress"];
 
         public async Task Execute(Guid workItemId, UpdateWorkItemStatusRequest request, CancellationToken ct = default)
         {
             var orgId = _tenantContext.GetOrganizationIdOrThrow();
             var workItem = await _workItemRepository.GetByIdAsync(workItemId, ct)
                 ?? throw new NotFoundException("Work item not found", "WorkItem", workItemId);
-            var validTransitions = new Dictionary<string, string[]>
-            {
-                { "Backlog", Backlog },
-                { "InProgress", InProgress },
-                { "Done", Done }
-            };
-
-            if (!validTransitions.TryGetValue(workItem.Status, out var value) || !value.Contains(request.Status))
-                throw new BusinessRuleException($"Invalid status transition from {workItem.Status} to {request.Status}.", "INVALID_STATUS_TRANSITION");
 
             var project = await _userRepository.GetProjectByWorkItemIdAsync(workItemId, ct)
                 ?? throw new NotFoundException("Project not found for this work item.", "WorkItem", workItemId);
@@ -35,8 +25,20 @@ namespace ProjectManager.Application.UseCases.WorkItems.Update
             if (project.OrganizationId != orgId)
                 throw new ForbiddenException("The project doesn't belong to your current organization context.");
 
-            workItem.Status = request.Status;
-            workItem.UpdatedAt = DateTime.UtcNow;
+            try
+            {
+                var newStatus = Enum.Parse<WorkItemStatus>(request.Status);
+                workItem.TransitionStatus(newStatus);
+            }
+            catch (InvalidWorkItemStatusTransitionException ex)
+            {
+                throw new BusinessRuleException(ex.Message, ex.ErrorCode);
+            }
+            catch (WorkItemCannotBeCompletedWithActiveSubtasksException ex)
+            {
+                throw new BusinessRuleException(ex.Message, ex.ErrorCode);
+            }
+
             await _workItemRepository.UpdateAsync(workItem, ct);
         }
     }

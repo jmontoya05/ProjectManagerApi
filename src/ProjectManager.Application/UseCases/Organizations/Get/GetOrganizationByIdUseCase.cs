@@ -4,7 +4,9 @@ using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Organizations.Get
 {
-    public sealed class GetOrganizationByIdUseCase(IOrganizationRepository organizationRepository) : IGetOrganizationByIdUseCase
+    public sealed class GetOrganizationByIdUseCase(
+        IOrganizationRepository organizationRepository
+    ) : IGetOrganizationByIdUseCase
     {
         private readonly IOrganizationRepository _organizationRepository = organizationRepository;
 
@@ -17,7 +19,7 @@ namespace ProjectManager.Application.UseCases.Organizations.Get
             {
                 Id = organization.Id,
                 Name = organization.Name,
-                Status = organization.Status,
+                Status = organization.Status.ToString(),
                 OwnerId = organization.OwnerId,
                 CreatedAt = organization.CreatedAt,
                 CreatedBy = organization.CreatedBy,

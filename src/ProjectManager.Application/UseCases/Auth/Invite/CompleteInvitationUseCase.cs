@@ -2,6 +2,7 @@ using ProjectManager.Application.DTOs.Auth;
 using ProjectManager.Application.Exceptions;
 using ProjectManager.Application.Ports;
 using ProjectManager.Domain.Entities;
+using ProjectManager.Domain.Enums;
 
 namespace ProjectManager.Application.UseCases.Auth.Invite
 {
@@ -35,7 +36,7 @@ namespace ProjectManager.Application.UseCases.Auth.Invite
                 Email = invitation.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 DisplayName = request.Name,
-                Status = "Active",
+                Status = UserStatus.Active,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

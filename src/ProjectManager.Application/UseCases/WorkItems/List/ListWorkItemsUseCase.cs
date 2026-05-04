@@ -4,7 +4,9 @@ using ProjectManager.Application.Ports;
 
 namespace ProjectManager.Application.UseCases.WorkItems.List
 {
-    public sealed class ListWorkItemsUseCase(IWorkItemRepository workItemRepository) : IListWorkItemsUseCase
+    public sealed class ListWorkItemsUseCase(
+        IWorkItemRepository workItemRepository
+    ) : IListWorkItemsUseCase
     {
         private readonly IWorkItemRepository _workItemRepository = workItemRepository;
 
@@ -24,8 +26,9 @@ namespace ProjectManager.Application.UseCases.WorkItems.List
                 Id = w.Id,
                 Title = w.Title,
                 Description = w.Description,
-                Status = w.Status,
-                Priority = w.Priority,
+                Type = w.Type.ToString(),
+                Status = w.Status.ToString(),
+                Priority = w.Priority.ToString(),
                 StoryPoints = w.StoryPoints,
                 TimeEstimateMinutes = w.TimeEstimateMinutes,
                 ProjectId = w.ProjectId,

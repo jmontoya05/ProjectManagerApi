@@ -4,7 +4,9 @@ using ProjectManager.Application.Exceptions;
 
 namespace ProjectManager.Application.UseCases.Projects.Get
 {
-    public sealed class GetProjectByIdUseCase(IProjectRepository projectRepository) : IGetProjectByIdUseCase
+    public sealed class GetProjectByIdUseCase(
+        IProjectRepository projectRepository
+    ) : IGetProjectByIdUseCase
     {
         private readonly IProjectRepository _projectRepository = projectRepository;
 
@@ -19,7 +21,7 @@ namespace ProjectManager.Application.UseCases.Projects.Get
                 Id = project.Id,
                 Name = project.Name,
                 Description = project.Description,
-                Status = project.Status,
+                Status = project.Status.ToString(),
                 OrganizationId = project.OrganizationId,
                 OwnerId = project.OwnerId,
                 CreatedAt = project.CreatedAt,

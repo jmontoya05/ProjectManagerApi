@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectManager.Infrastructure.Persistence.Context;
 
 #nullable disable
 
-namespace ProjectManager.Infrastructure.Migrations
+namespace ProjectManager.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ProjectManagerDbContext))]
-    partial class ProjectManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430203235_Auditory field added for each entity")]
+    partial class Auditoryfieldaddedforeachentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -821,7 +824,7 @@ namespace ProjectManager.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ProjectManager.Domain.Entities.Project", "Project")
-                        .WithMany("WorkItems")
+                        .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -859,8 +862,6 @@ namespace ProjectManager.Infrastructure.Migrations
             modelBuilder.Entity("ProjectManager.Domain.Entities.Project", b =>
                 {
                     b.Navigation("ProjectMemberships");
-
-                    b.Navigation("WorkItems");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.Role", b =>
