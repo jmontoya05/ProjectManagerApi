@@ -10,7 +10,7 @@ namespace ProjectManager.Api.Conventions
         {
             foreach (var controller in application.Controllers)
             {
-                if (controller.Selectors == null || controller.Selectors.Count == 0)
+                if (controller.Selectors.Count == 0)
                     continue;
 
                 foreach (var selector in controller.Selectors)

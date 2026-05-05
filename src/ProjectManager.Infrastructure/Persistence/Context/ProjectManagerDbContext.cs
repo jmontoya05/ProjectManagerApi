@@ -32,22 +32,27 @@ namespace ProjectManager.Infrastructure.Persistence.Context
             var entries = ChangeTracker.Entries<EntityBase>();
             foreach (var entry in entries)
             {
-                if (entry.State == EntityState.Added)
+                switch (entry.State)
                 {
-                    entry.Entity.CreatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.CreatedBy = _tenantContext.TryGetUserId();
-                    entry.Entity.UpdatedBy = _tenantContext.TryGetUserId();
-                }
-                else if (entry.State == EntityState.Modified)
-                {
-                    entry.Entity.UpdatedAt = DateTime.UtcNow;
-                    entry.Entity.UpdatedBy = _tenantContext.GetUserIdOrThrow();
-                }
-                else if (entry.State == EntityState.Deleted)
-                {
-                    entry.Entity.DeletedAt = DateTime.UtcNow;
-                    entry.Entity.DeletedBy = _tenantContext.GetUserIdOrThrow();
+                    case EntityState.Added:
+                        entry.Entity.CreatedAt = DateTime.UtcNow;
+                        entry.Entity.UpdatedAt = DateTime.UtcNow;
+                        entry.Entity.CreatedBy = _tenantContext.TryGetUserId();
+                        entry.Entity.UpdatedBy = _tenantContext.TryGetUserId();
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.UpdatedAt = DateTime.UtcNow;
+                        entry.Entity.UpdatedBy = _tenantContext.GetUserIdOrThrow();
+                        break;
+                    case EntityState.Deleted:
+                        entry.Entity.DeletedAt = DateTime.UtcNow;
+                        entry.Entity.DeletedBy = _tenantContext.GetUserIdOrThrow();
+                        break;
+                    case EntityState.Detached:
+                    case EntityState.Unchanged:
+                        break;
+                    default:
+                        throw new ApplicationException();
                 }
             }
             return base.SaveChangesAsync(cancellationToken);
@@ -188,6 +193,7 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                 entity.HasOne(rp => rp.Permission)
                       .WithMany(p => p.RolePermissions)
                       .HasForeignKey(rp => rp.PermissionId);
+                entity.HasQueryFilter(rp => rp.Permission.DeletedAt == null);
             });
             modelBuilder.Entity<Invitation>(entity =>
             {
@@ -271,11 +277,13 @@ namespace ProjectManager.Infrastructure.Persistence.Context
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(u => u.Status).HasConversion<string>();
+                entity.Ignore(u => u.PhoneNumber);
             });
 
             modelBuilder.Entity<Organization>(entity =>
             {
                 entity.Property(o => o.Status).HasConversion<string>();
+                entity.Ignore(o => o.Address);
             });
 
             modelBuilder.Entity<Project>(entity =>
@@ -288,6 +296,8 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                 entity.Property(wi => wi.Type).HasConversion<string>();
                 entity.Property(wi => wi.Priority).HasConversion<string>();
                 entity.Property(wi => wi.Status).HasConversion<string>();
+                entity.Property(wi => wi.CompletionPercentageValue).HasPrecision(5, 2);
+                entity.Ignore(wi => wi.CompletionPercentage);
             });
         }
     }

@@ -1,5 +1,6 @@
 ﻿using ProjectManager.Domain.Enums;
 using ProjectManager.Domain.Exceptions;
+using ProjectManager.Domain.ValueObjects;
 
 namespace ProjectManager.Domain.Entities
 {
@@ -16,7 +17,14 @@ namespace ProjectManager.Domain.Entities
         public Guid? ParentWorkItemId { get; init; }
         public Guid? AssigneeId { get; set; }
         public Guid? TeamId { get; set; }
-        // Navigation
+        public decimal CompletionPercentageValue { get; set; }
+        public Percentage CompletionPercentage
+        {
+            get => Percentage.Create(CompletionPercentageValue);
+            set => CompletionPercentageValue = value.Value;
+        }
+
+        // Navigation properties
         public virtual Project Project { get; init; } = null!;
         public virtual WorkItem? ParentWorkItem { get; init; }
         public virtual ICollection<WorkItem> Subtasks { get; init; } = [];
@@ -47,9 +55,17 @@ namespace ProjectManager.Domain.Entities
                 {
                     throw new WorkItemCannotBeCompletedWithActiveSubtasksException(Id, activeSubtasks.Count);
                 }
+
+                CompletionPercentage = Percentage.Complete;
             }
 
             Status = newStatus;
+            UpdatedAt = DateTime.UtcNow;
+        }
+        
+        public void UpdateCompletionPercentage(decimal percentageValue)
+        {
+            CompletionPercentage = Percentage.Create(percentageValue);
             UpdatedAt = DateTime.UtcNow;
         }
         
@@ -92,5 +108,7 @@ namespace ProjectManager.Domain.Entities
         public bool IsTeamAssigned => TeamId.HasValue;
 
         public bool IsParent => Subtasks.Count > 0;
+        
+        public bool IsPartiallyComplete => CompletionPercentage.IsPartial;
     }
 }

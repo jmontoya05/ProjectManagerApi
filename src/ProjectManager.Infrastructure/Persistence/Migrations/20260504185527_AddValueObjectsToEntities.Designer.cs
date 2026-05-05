@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectManager.Infrastructure.Persistence.Context;
 
 #nullable disable
 
-namespace ProjectManager.Infrastructure.Migrations
+namespace ProjectManager.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ProjectManagerDbContext))]
-    partial class ProjectManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260504185527_AddValueObjectsToEntities")]
+    partial class AddValueObjectsToEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +73,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Invitations", (string)null);
+                    b.ToTable("Invitations");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.Organization", b =>
@@ -127,7 +130,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Organizations", (string)null);
+                    b.ToTable("Organizations");
 
                     b.HasData(
                         new
@@ -182,7 +185,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("OrganizationMemberships", (string)null);
+                    b.ToTable("OrganizationMemberships");
 
                     b.HasData(
                         new
@@ -230,7 +233,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions", (string)null);
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.Project", b =>
@@ -281,7 +284,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.ProjectMembership", b =>
@@ -325,7 +328,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProjectMemberships", (string)null);
+                    b.ToTable("ProjectMemberships");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.RefreshToken", b =>
@@ -369,7 +372,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.Role", b =>
@@ -411,7 +414,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -452,7 +455,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.ToTable("RolePermissions", (string)null);
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.Team", b =>
@@ -490,7 +493,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.TeamMember", b =>
@@ -529,7 +532,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TeamMembers", (string)null);
+                    b.ToTable("TeamMembers");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.User", b =>
@@ -581,7 +584,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -672,7 +675,7 @@ namespace ProjectManager.Infrastructure.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("WorkItems", (string)null);
+                    b.ToTable("WorkItems");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.Organization", b =>
