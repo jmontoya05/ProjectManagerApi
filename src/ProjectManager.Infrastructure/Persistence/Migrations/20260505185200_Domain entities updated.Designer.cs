@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectManager.Infrastructure.Persistence.Context;
 
 #nullable disable
 
-namespace ProjectManager.Infrastructure.Migrations
+namespace ProjectManager.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ProjectManagerDbContext))]
-    partial class ProjectManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505185200_Domain entities updated")]
+    partial class Domainentitiesupdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -455,60 +458,6 @@ namespace ProjectManager.Infrastructure.Migrations
                     b.ToTable("RolePermissions");
                 });
 
-            modelBuilder.Entity("ProjectManager.Domain.Entities.Sprint", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Capacity")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Goal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("Sprints");
-                });
-
             modelBuilder.Entity("ProjectManager.Domain.Entities.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -730,49 +679,6 @@ namespace ProjectManager.Infrastructure.Migrations
                     b.ToTable("WorkItems");
                 });
 
-            modelBuilder.Entity("ProjectManager.Domain.ValueObjects.SprintWorkItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SprintId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("WorkItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkItemId");
-
-                    b.HasIndex("SprintId", "WorkItemId")
-                        .IsUnique();
-
-                    b.ToTable("SprintWorkItems");
-                });
-
             modelBuilder.Entity("ProjectManager.Domain.Entities.Organization", b =>
                 {
                     b.HasOne("ProjectManager.Domain.Entities.User", "Owner")
@@ -897,17 +803,6 @@ namespace ProjectManager.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("ProjectManager.Domain.Entities.Sprint", b =>
-                {
-                    b.HasOne("ProjectManager.Domain.Entities.Project", "Project")
-                        .WithMany("Sprints")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("ProjectManager.Domain.Entities.Team", b =>
                 {
                     b.HasOne("ProjectManager.Domain.Entities.Organization", "Organization")
@@ -970,25 +865,6 @@ namespace ProjectManager.Infrastructure.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("ProjectManager.Domain.ValueObjects.SprintWorkItem", b =>
-                {
-                    b.HasOne("ProjectManager.Domain.Entities.Sprint", "Sprint")
-                        .WithMany("WorkItems")
-                        .HasForeignKey("SprintId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectManager.Domain.Entities.WorkItem", "WorkItem")
-                        .WithMany()
-                        .HasForeignKey("WorkItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Sprint");
-
-                    b.Navigation("WorkItem");
-                });
-
             modelBuilder.Entity("ProjectManager.Domain.Entities.Organization", b =>
                 {
                     b.Navigation("OrganizationMemberships");
@@ -1009,8 +885,6 @@ namespace ProjectManager.Infrastructure.Migrations
                 {
                     b.Navigation("ProjectMemberships");
 
-                    b.Navigation("Sprints");
-
                     b.Navigation("WorkItems");
                 });
 
@@ -1021,11 +895,6 @@ namespace ProjectManager.Infrastructure.Migrations
                     b.Navigation("ProjectMemberships");
 
                     b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("ProjectManager.Domain.Entities.Sprint", b =>
-                {
-                    b.Navigation("WorkItems");
                 });
 
             modelBuilder.Entity("ProjectManager.Domain.Entities.Team", b =>

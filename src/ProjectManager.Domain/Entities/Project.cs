@@ -15,6 +15,7 @@ namespace ProjectManager.Domain.Entities
         public virtual User Owner { get; init; } = null!;
         public virtual ICollection<ProjectMembership> ProjectMemberships { get; init; } = [];
         public virtual ICollection<WorkItem> WorkItems { get; init; } = [];
+        public virtual ICollection<Sprint> Sprints { get; init; } = [];
         
         public void TransitionStatus(ProjectStatus newStatus)
         {

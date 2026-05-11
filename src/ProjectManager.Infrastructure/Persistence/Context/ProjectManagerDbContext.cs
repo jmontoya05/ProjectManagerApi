@@ -2,6 +2,7 @@
 using ProjectManager.Application.Services;
 using ProjectManager.Domain.Entities;
 using ProjectManager.Domain.Enums;
+using ProjectManager.Domain.ValueObjects;
 
 namespace ProjectManager.Infrastructure.Persistence.Context
 {
@@ -26,6 +27,8 @@ namespace ProjectManager.Infrastructure.Persistence.Context
         public DbSet<ProjectMembership> ProjectMemberships => Set<ProjectMembership>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<Invitation> Invitations => Set<Invitation>();
+        public DbSet<Sprint> Sprints => Set<Sprint>();
+        public DbSet<SprintWorkItem> SprintWorkItems => Set<SprintWorkItem>();
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -118,6 +121,37 @@ namespace ProjectManager.Infrastructure.Persistence.Context
                       .WithMany()
                       .HasForeignKey(p => p.OwnerId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Sprint>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+
+                entity.HasOne(s => s.Project)
+                      .WithMany(p => p.Sprints)
+                      .HasForeignKey(s => s.ProjectId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(s => s.Status)
+                      .HasConversion<string>();
+            });
+
+            modelBuilder.Entity<SprintWorkItem>(entity =>
+            {
+                entity.HasKey(swi => swi.Id);
+
+                entity.HasOne(swi => swi.Sprint)
+                      .WithMany(s => s.WorkItems)
+                      .HasForeignKey(swi => swi.SprintId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(swi => swi.WorkItem)
+                      .WithMany()
+                      .HasForeignKey(swi => swi.WorkItemId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(swi => new { swi.SprintId, swi.WorkItemId })
+                      .IsUnique();
             });
 
             modelBuilder.Entity<Role>().HasData(
@@ -273,6 +307,8 @@ namespace ProjectManager.Infrastructure.Persistence.Context
             modelBuilder.Entity<Invitation>().HasQueryFilter(i => i.DeletedAt == null);
             modelBuilder.Entity<TeamMember>().HasQueryFilter(tm => tm.DeletedAt == null);
             modelBuilder.Entity<ProjectMembership>().HasQueryFilter(pm => pm.DeletedAt == null);
+            modelBuilder.Entity<Sprint>().HasQueryFilter(s => s.DeletedAt == null);
+            modelBuilder.Entity<SprintWorkItem>().HasQueryFilter(swi => swi.DeletedAt == null);
 
             modelBuilder.Entity<User>(entity =>
             {

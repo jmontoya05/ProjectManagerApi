@@ -46,6 +46,18 @@ using ProjectManager.Application.UseCases.Roles.GetAll;
 using ProjectManager.Application.UseCases.Roles.GetAllByOrganization;
 using ProjectManager.Application.UseCases.Roles.GetById;
 using ProjectManager.Application.UseCases.Roles.Update;
+using ProjectManager.Application.UseCases.Sprints.Create;
+using ProjectManager.Application.UseCases.Sprints.Update;
+using ProjectManager.Application.UseCases.Sprints.GetById;
+using ProjectManager.Application.UseCases.Sprints.ListByProject;
+using ProjectManager.Application.UseCases.Sprints.Delete;
+using ProjectManager.Application.UseCases.Sprints.Start;
+using ProjectManager.Application.UseCases.Sprints.Complete;
+using ProjectManager.Application.UseCases.Sprints.AddWorkItem;
+using ProjectManager.Application.UseCases.Sprints.RemoveWorkItem;
+using ProjectManager.Application.UseCases.Sprints.ListWorkItems;
+using ProjectManager.Application.UseCases.Sprints.ReorderWorkItems;
+using ProjectManager.Application.UseCases.Sprints.GetVelocity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -154,6 +166,20 @@ builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>(
 builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
 builder.Services.AddScoped<IOrganizationRoleAssignmentUseCase, OrganizationRoleAssignmentUseCase>();
 builder.Services.AddScoped<IProjectRoleAssignmentService, ProjectRoleAssignmentService>();
+builder.Services.AddScoped<ISprintRepository, SprintRepository>();
+builder.Services.AddScoped<ISprintWorkItemRepository, SprintWorkItemRepository>();
+builder.Services.AddScoped<ICreateSprintUseCase, CreateSprintUseCase>();
+builder.Services.AddScoped<IUpdateSprintUseCase, UpdateSprintUseCase>();
+builder.Services.AddScoped<IGetSprintByIdUseCase, GetSprintByIdUseCase>();
+builder.Services.AddScoped<IListSprintsByProjectUseCase, ListSprintsByProjectUseCase>();
+builder.Services.AddScoped<IDeleteSprintUseCase, DeleteSprintUseCase>();
+builder.Services.AddScoped<IStartSprintUseCase, StartSprintUseCase>();
+builder.Services.AddScoped<ICompleteSprintUseCase, CompleteSprintUseCase>();
+builder.Services.AddScoped<IAddWorkItemToSprintUseCase, AddWorkItemToSprintUseCase>();
+builder.Services.AddScoped<IRemoveWorkItemFromSprintUseCase, RemoveWorkItemFromSprintUseCase>();
+builder.Services.AddScoped<IListSprintWorkItemsUseCase, ListSprintWorkItemsUseCase>();
+builder.Services.AddScoped<IReorderSprintWorkItemsUseCase, ReorderSprintWorkItemsUseCase>();
+builder.Services.AddScoped<IGetSprintVelocityUseCase, GetSprintVelocityUseCase>();
 
 var app = builder.Build();
 

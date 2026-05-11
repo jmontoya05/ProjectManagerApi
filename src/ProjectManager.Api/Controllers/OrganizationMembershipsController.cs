@@ -7,7 +7,7 @@ namespace ProjectManager.Api.Controllers
 {
     [ApiController]
     [Route("organizations/{orgId:guid}/memberships")]
-    [Authorize(Policy = "OrgAdmin")]
+    [Authorize(Policy = "OrgOwner")] //Change to OrgAdmin
     public class OrganizationMembershipsController(IOrganizationRoleAssignmentUseCase orgRoleUseCase) : ControllerBase
     {
         [HttpPost("assign-role")]
